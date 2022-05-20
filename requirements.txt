@@ -1,0 +1,9 @@
+# beautifulsoup4    # https://pypi.org/project/beautifulsoup4/
+click             # https://pypi.org/project/click/
+colorlog          # https://pypi.org/project/colorlog/
+# Pillow            # https://pypi.org/project/Pillow/
+# PyAutoGUI         # https://pypi.org/project/PyAutoGUI/
+# python-dotenv     # https://pypi.org/project/python-dotenv/
+# selenium          # https://pypi.org/project/selenium/
+# requests          # https://pypi.org/project/requests/
+# tqdm              # https://pypi.org/project/tqdm/
