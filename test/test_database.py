@@ -5,7 +5,7 @@ from app.service import database
 
 class TestDatabase(unittest.TestCase):
     """"""
-    print('TestDatabase()')
+    pass
 
 
 if __name__ == '__main__':

@@ -16,6 +16,6 @@ setup(
     install_requires=get_requirements(),
     entry_points="""
         [console_scripts]
-        MarkData_CLI=app.cli:run
+        markdata=app.cli:run
     """,
 )

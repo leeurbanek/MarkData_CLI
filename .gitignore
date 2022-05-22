@@ -55,9 +55,11 @@ cover/
 *.mo
 *.pot
 
-# Django stuff:
+# My stuff:
 *.bak
 *.log
+.adblock_link
+/chart
 db.sqlite3
 migrations/
 TODO

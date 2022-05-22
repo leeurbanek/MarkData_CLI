@@ -27,6 +27,12 @@ def run():
 @run.command()
 @click.argument('new_default', nargs=1, default=None, required=True, type=str)
 
+# Path or symbolic link to Adblockultimate
+@click.option(
+    '--ad_block', 'transform', flag_value='ad_block',
+    help='Location or link to Adblockultimate'
+    )
+
 # Set path to your chart directory
 @click.option(
     '--chart_dir', 'transform', flag_value='chart_dir',
@@ -37,6 +43,12 @@ def run():
 @click.option(
     '--db_path', 'transform', flag_value='db_path',
     help='Set path to the default database'
+    )
+
+# Location of the browser driver for Selenium
+@click.option(
+    '--gecko_drv', 'transform', flag_value='gecko_drv',
+    help='Path to Gecko driver (Windows users)'
     )
 
 def config(transform, new_default):
@@ -70,10 +82,10 @@ def initdb(db_path, symbol):
     database.creator(db_path, symbol)
 
 
-@run.command()
-def dropdb(db_path):
-    """Not Implemented"""
-    pass
+# @run.command()
+# def dropdb(db_path):
+#     """Not Implemented"""
+#     pass
 
 
 @run.command()

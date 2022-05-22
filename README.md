@@ -70,3 +70,24 @@ marcli chart --help
 To learn more about StockCharts and the exelect services they offer visit [StockCharts.com](https://stockcharts.com/) be sure to check out the ChartSchool tab too.
 
 If you notice any errors, mistakes, or opportunities for improvement please let me know.
+
+=======
+
+# python-dotenv https://pypi.org/project/python-dotenv/
+# Sample '.env' file, edit this to suit your system.
+# Before running change the name of this file to '.env'.
+
+
+# Symbolic link to Adblockultimate
+AD_BLOCK = '/location/of/Adblockultimate'
+
+
+# For Windows users:
+# location of the browser driver for Selenium
+DRIVER_PATH = r'\path\to\geckodriver'  # Firefox
+
+
+# Note: To find location of Adblockultimate in Firefox 78.13.0 for example:
+#  Go to the url about:support.
+#  In Application Basics table, next to Profile Directory, click button 'Open Directory'.
+#  Open extensions folder. The file you want ends with 'adblockultimate.net.xpi'.
