@@ -35,7 +35,14 @@ git clone <url of this repository> marcli_pkg && cd marcli_pkg
 
 ## Configuration
 
-TODO
+Install [AdBlocker Ultimate](https://adblockultimate.net/).  Next you need to find where adblockultimate was installed.  For example in Firefox:
+1. Go to the url about:support.
+2. In 'Application Basics' table, next to 'Profile Directory', click button 'Open Directory'.
+3. Open extensions folder. The file you want ends with 'adblockultimate.net.xpi'.
+
+Make a note of this file path or create a link to the file.  Now run `markdata config --ad_block` and add the path or link.
+
+If you are using Windows set `markdata config --gecko_drv` to the location of the [Firefox driver](https://github.com/mozilla/geckodriver/releases) that Selenium will need.
 
 ## Usage
 
@@ -44,15 +51,15 @@ Open a terminal if it was closed and start the virtual environment you set up ea
 Make sure you edited the `.env` and `config.ini` files to suit your preferences then type the following at the prompt to get started:
 
 ```
-marcli --help
+markdata --help
 ```
 
 If all went well you should see something like this:
 
 ```
-Usage: marcli [OPTIONS] COMMAND [ARGS]...
+Usage: markdata [OPTIONS] COMMAND [ARGS]...
 
-  MarCLI: A stock MARket Command Line Interface data retrieval tool.
+  Markdata_CLI: A stock MARket Command Line Interface data retrieval tool.
 
 Options:
   --help  Show this message and exit.
@@ -63,31 +70,10 @@ Commands:
 ```
 To view the `--help` text for the other commands, 'chart' for example, you can use:
 ```
-marcli chart --help
+markdata chart --help
 ```
 ## General Notes
 
-To learn more about StockCharts and the exelect services they offer visit [StockCharts.com](https://stockcharts.com/) be sure to check out the ChartSchool tab too.
+To learn more about StockCharts.com and the exelect services they offer visit [StockCharts.com](https://stockcharts.com/) be sure to check out the ChartSchool tab too.
 
 If you notice any errors, mistakes, or opportunities for improvement please let me know.
-
-=======
-
-# python-dotenv https://pypi.org/project/python-dotenv/
-# Sample '.env' file, edit this to suit your system.
-# Before running change the name of this file to '.env'.
-
-
-# Symbolic link to Adblockultimate
-AD_BLOCK = '/location/of/Adblockultimate'
-
-
-# For Windows users:
-# location of the browser driver for Selenium
-DRIVER_PATH = r'\path\to\geckodriver'  # Firefox
-
-
-# Note: To find location of Adblockultimate in Firefox 78.13.0 for example:
-#  Go to the url about:support.
-#  In Application Basics table, next to Profile Directory, click button 'Open Directory'.
-#  Open extensions folder. The file you want ends with 'adblockultimate.net.xpi'.
