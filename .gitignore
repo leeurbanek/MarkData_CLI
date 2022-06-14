@@ -59,10 +59,13 @@ cover/
 *.bak
 *.log
 .adblock_link
-/chart
-db.sqlite3
+*.sqlite3
 migrations/
 TODO
+app/beta.py
+x*.*
+data/
+*.json
 
 # Environments
 .env
