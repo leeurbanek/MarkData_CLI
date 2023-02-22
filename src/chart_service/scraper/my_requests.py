@@ -9,7 +9,7 @@ from PIL import Image
 from requests_html import HTMLSession
 
 from src import config_file
-from src.utils import Spinner
+from src.utils import SpinnerManager
 
 
 conf_obj = ConfigParser()
@@ -39,7 +39,7 @@ class WebScraper:
         """"""
         if self.debug: logger.debug(f'webscraper({self.symbol}, {self.period})')
         if not self.debug: print(f'  fetching chart: {self.symbol}_{self.period.lower()}.png... ', end=' ')
-        with Spinner():
+        with SpinnerManager():
             form = self._get_all_forms()[2]
             details = self._get_form_details(form)
             soup = self._submit_form(details)

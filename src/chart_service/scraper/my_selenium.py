@@ -10,7 +10,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
 
 from src import config_file
-from src.utils import Spinner, WebDriverManager
+from src.utils import SpinnerManager, WebDriverManager
 
 
 conf_obj = ConfigParser()
@@ -41,7 +41,7 @@ class WebScraper:
         if self.debug: logger.debug(f'webscraper({self.symbol}, {self.period})')
         with WebDriverManager(debug=self.debug) as driver:
             if not self.debug: print(f'  fetching chart: {self.symbol}_{self.period.lower()}.png... ', end=' ')
-            with Spinner():
+            with SpinnerManager():
                 self._set_chart_page(driver)
                 content = self._get_page_content(driver)
                 src = self._get_img_src(content)

@@ -5,8 +5,8 @@ from configparser import ConfigParser
 from src import config_file
 
 # Select which version of the webscraper to use
-from src.chart_service.my_requests import WebScraper
-# from src.chart_service.my_selenium import WebScraper
+from src.chart_service.scraper.my_requests import WebScraper
+# from src.chart_service.scraper.my_selenium import WebScraper
 
 
 conf_obj = ConfigParser(converters={'list': lambda x: [i.strip() for i in x.split(',')]})
