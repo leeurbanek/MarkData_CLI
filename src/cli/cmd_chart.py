@@ -63,6 +63,7 @@ def cli(ctx, opt_trans, symbol):
         ctx.obj['symbol'] = symbol
 
         client.get_chart(ctx.obj)
+
     else:  # print default message
         click.echo(f"""Usage: markdata chart [OPTIONS] [SYMBOL]...
 Try 'markdata chart --help' for help.""")

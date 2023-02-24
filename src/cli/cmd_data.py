@@ -4,6 +4,7 @@ from configparser import ConfigParser
 import click
 
 from src import config_file
+from src.data_service import client
 
 
 conf_obj = ConfigParser(
@@ -26,8 +27,17 @@ DESCRIPTION
     Try 'data --help' for help with data options.
 """)
 
+@click.argument('symbol', nargs=-1, default=None, required=False, type=str)
+
 @click.pass_context
-def cli(ctx):
+def cli(ctx, symbol):
     """Run data command"""
     if ctx.obj['debug']:
         logger.debug(f"cli(ctx)")
+
+    period = None
+
+    ctx.obj['period'] = period
+    ctx.obj['symbol'] = symbol
+
+    client.get_data(ctx.obj)
