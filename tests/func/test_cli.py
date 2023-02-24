@@ -39,6 +39,11 @@ class TestClickBasicSetup(unittest.TestCase):
         self.assertIn('Usage: main-cli config', result.output)
         self.assertEqual(0, result.exit_code)
 
+    def test_data_help_exists(self):
+        result = self.runner.invoke(main_cli, 'data --help')
+        self.assertIn('Usage: main-cli data', result.output)
+        self.assertEqual(0, result.exit_code)
+
 
 if __name__ == '__main__':
     unittest.main()
