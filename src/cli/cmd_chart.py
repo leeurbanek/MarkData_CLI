@@ -33,9 +33,9 @@ DESCRIPTION
 
 @click.argument('symbol', nargs=-1, default=None, required=False, type=str)
 
-@click.option('-a', '--all', 'opt_trans', flag_value='all', help='Fetch daily and weekly charts.')
-@click.option('-d', '--daily', 'opt_trans', flag_value='daily', help='Fetch only daily charts.')
-@click.option('-w', '--weekly', 'opt_trans', flag_value='weekly', help='Fetch only the weekly charts.')
+@click.option('--all', 'opt_trans', flag_value='all', help='Fetch daily and weekly charts.')
+@click.option('--daily', 'opt_trans', flag_value='daily', help='Fetch only daily charts.')
+@click.option('--weekly', 'opt_trans', flag_value='weekly', help='Fetch only weekly charts.')
 
 @click.pass_context
 def cli(ctx, opt_trans, symbol):

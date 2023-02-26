@@ -18,26 +18,45 @@ logger = logging.getLogger(__name__)
 @click.command('data', short_help="Fetch online OHLC price and volume data", help="""
 \b
 NAME
-    data -- Get online OHLC data from various online sources
+    data -- Retrieve OHLC data from various online sources
 \b
 SYNOPSIS
     data [Options] [ticker1 ticker2 ticker3 ...]
 \b
 DESCRIPTION
-    Try 'data --help' for help with data options.
+    The data utility attempts to retrieve OHLC data from various
+    online sources.  If no ticker symbols are provided the default
+    symbols from the config settings are used.  Try 'data --help'
+    for help with config settings.
 """)
 
 @click.argument('symbol', nargs=-1, default=None, required=False, type=str)
 
+@click.option('--alpha', 'opt_trans', flag_value='alpha', help='Fetch daily and weekly charts.')
+@click.option('--tingo', 'opt_trans', flag_value='tingo', help='Fetch only daily charts.')
+@click.option('--yahoo', 'opt_trans', flag_value='yahoo', help='Fetch only the weekly charts.')
+
 @click.pass_context
-def cli(ctx, symbol):
-    """Run data command"""
+def cli(ctx, opt_trans, symbol):
+    """Run chart command"""
     if ctx.obj['debug']:
-        logger.debug(f"cli(ctx)")
+        logger.debug(f"cli(ctx, opt_trans={opt_trans}, symbol={symbol })")
 
-    period = None
+    if opt_trans:
 
-    ctx.obj['period'] = period
-    ctx.obj['symbol'] = symbol
+        if symbol:  # use symbols from command line input
+            symbol = [s.upper() for s in list(symbol)]
+        else:  # use symbols from config.ini
+            symbol = conf_obj.getlist('Ticker', 'symbol')
 
-    client.get_data(ctx.obj)
+        # add parameters to context object
+        ctx.obj['opt_trans'] = opt_trans
+        ctx.obj['symbol'] = symbol
+
+        client.get_data(ctx.obj)
+
+    else:  # print default message
+        click.echo(f"""Usage: markdata data [OPTIONS] [SYMBOL]...
+Try 'markdata data --help' for help.""")
+
+# subprocess.run(['open', filename], check=True)
