@@ -32,9 +32,8 @@ DESCRIPTION
 
 @click.argument('symbol', nargs=-1, default=None, required=False, type=str)
 
-@click.option('--alpha', 'opt_trans', flag_value='alpha', help='Fetch daily and weekly charts.')
-@click.option('--tingo', 'opt_trans', flag_value='tingo', help='Fetch only daily charts.')
-@click.option('--yahoo', 'opt_trans', flag_value='yahoo', help='Fetch only the weekly charts.')
+@click.option('-a', '--alpha', 'opt_trans', flag_value='alpha', help='Fetch data from https://www.alphavantage.co/.')
+@click.option('-t', '--tingo', 'opt_trans', flag_value='tingo', help='Fetch data from https://api.tiingo.com/.')
 
 @click.pass_context
 def cli(ctx, opt_trans, symbol):
