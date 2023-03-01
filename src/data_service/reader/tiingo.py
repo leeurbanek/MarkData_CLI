@@ -1,11 +1,6 @@
 import requests
 
-
-API_KEY = None
-BASE_URL = 'https://api.tiingo.com/tiingo'
-FUNCTION = None
-PERIOD = None
-SYMBOL = None
+from src import tiingo_key
 
 
 # url = f"{BASE_URL}/prices?startDate={PERIOD}&token={API_KEY}"
@@ -20,10 +15,11 @@ SYMBOL = None
 
 # =======
 
-# class Tiingo():
-#     """"""
-#     def __init__(self) -> None:
-#         pass
+class TiingoReader():
+    """"""
+    def __init__(self) -> None:
+        self.base_url = 'https://api.tiingo.com/tiingo'
+        self.key = tiingo_key
 
 # [
 #     {

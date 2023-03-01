@@ -2,7 +2,7 @@ import logging
 
 from configparser import ConfigParser
 
-from src import alpha_key, config_file
+from src import config_file
 
 
 conf_obj = ConfigParser(converters={'list': lambda x: [i.strip() for i in x.split(',')]})
@@ -11,27 +11,34 @@ conf_obj.read(config_file)
 logger = logging.getLogger(__name__)
 
 
-def get_data(ctx):
+def choose_data_provider(ctx):
     """"""
-    debug = ctx['debug']
-    symbol = ctx['symbol']
+    if ctx['debug']: logger.debug(f"choose_data_provider(ctx={ctx})")
 
-    if debug: logger.debug(f"alpha_key={alpha_key}")
-    if debug: logger.debug(f"get_data(ctx={ctx})")
-    if not debug: print(f"Saving to '{conf_obj.get('Default', 'chart_dir')}'\nstarting download")
+    if ctx['opt_trans'] == 'alpha':
+        get_alphavantage_data(conf_obj, ctx)
 
-#     # count = len(period) * len(symbol)
-#     [download(debug, p, s) for p in period for s in symbol]
-#     if not debug: print('cleaning up... ', end='')
-#     if not debug: print('\b finished.')
+    elif ctx['opt_trans'] == 'tiingo':
+        get_tiingo_data(conf_obj, ctx)
 
 
-# def download(debug, period, symbol):
-#     """"""
-#     if debug: logger.debug(f"download(period={period} {type(period)}, symbol={symbol} {type(symbol)})")
+def get_alphavantage_data(conf_obj, ctx_obj):
+    from src.data_service.reader.alpha import AlphaReader
+    data = AlphaReader()
 
-#     start = WebScraper(debug, period, symbol)
-#     try:
-#         start.webscraper()
-#     except:
-#         pass
+    if ctx_obj['debug']:
+        logger.debug(f"get_alphavantage_data(ctx_obj={ctx_obj})")
+        logger.debug(f"alphavantage key: {data.key}")
+
+
+def get_tiingo_data(conf_obj, ctx_obj):
+    from src.data_service.reader.tiingo import TiingoReader
+    data = TiingoReader()
+
+    if ctx_obj['debug']:
+        logger.debug(f"get_tiingo_data(ctx_obj={ctx_obj})")
+        logger.debug(f"tiingo key: {data.key}")
+
+
+def write_to_database():
+    pass

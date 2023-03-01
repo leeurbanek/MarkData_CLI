@@ -1,22 +1,22 @@
 import logging
 import os
-from configparser import ConfigParser
+# from configparser import ConfigParser
 
 import click
 
-from src import config_file
+from src import config_file, conf_obj
 
 
-conf_obj = ConfigParser(converters={'list': lambda x: [i.strip() for i in x.split(',')]})
+# conf_obj = ConfigParser(converters={'list': lambda x: [i.strip() for i in x.split(',')]})
 conf_obj.read(config_file)
 
 logger = logging.getLogger(__name__)
 
 
-def update_default_chart_dir_value(conf_obj, ctx_obj):
+def update_default_chart_dir(conf_obj, ctx_obj):
     """"""
     if ctx_obj['debug']:
-        logger.debug(f"update_default_chart_dir_value(section={ctx_obj['section']}, opt_trans={ctx_obj['opt_trans']})")
+        logger.debug(f"update_default_chart_dir(section={ctx_obj['section']}, opt_trans={ctx_obj['opt_trans']})")
 
     current = f"{conf_obj.get('Default', 'chart_dir')}"
     click.confirm(
@@ -36,10 +36,13 @@ def update_default_chart_dir_value(conf_obj, ctx_obj):
             print(f"OSError '{new_value}': try using absolute path to chart directory.")
 
 
-def update_ticker_symbol_value(conf_obj, ctx_obj):
+def update_ticker_symbol(conf_obj, ctx_obj):
     """"""
     if ctx_obj['debug']:
-        logger.debug(f"update_chart(conf_obj={conf_obj}, ctx_obj={ctx_obj})")
+        logger.debug(f"update_ticker_symbol(conf_obj={conf_obj}, ctx_obj={ctx_obj})")
+
+    current = f"{conf_obj.get('Ticker', 'symbol')}"
+    click.echo(f"Current {ctx_obj['opt_trans']}: '{current}'\nTry 'markdata config --help' for help.")
 
     # Current ticker symbols from config.ini
     conf_symbol = conf_obj.getlist('Ticker', 'symbol')
@@ -98,13 +101,13 @@ DESCRIPTION
 
 # config Chart
 @click.option(
-    '--chart-dir', 'opt_trans', flag_value='chart_dir',
+    '-c', '--chart-dir', 'opt_trans', flag_value='chart_dir',
     help=f"Change chart directory, current: '{conf_obj.get('Default', 'chart_dir')}'"
     )
 
 # config Ticker
 @click.option(
-    '--symbol', 'opt_trans', flag_value='symbol',
+    '-s', '--symbol', 'opt_trans', flag_value='symbol',
     help=f"Add/remove ticker symbols, current: '{conf_obj.get('Ticker', 'symbol')}'"
     )
 
@@ -120,7 +123,7 @@ def cli(ctx, opt_trans, arguments):
         if opt_trans == 'chart_dir':
             section = conf_obj['Default']
             ctx.obj['section'] = section  # add section to ctx
-            new_value = update_default_chart_dir_value(conf_obj, ctx.obj)
+            new_value = update_default_chart_dir(conf_obj, ctx.obj)
             if new_value:
                 section[opt_trans] = new_value
                 write_new_value_to_config()
@@ -128,7 +131,7 @@ def cli(ctx, opt_trans, arguments):
             section = conf_obj['Ticker']
             ctx.obj['section'] = section  # add section to ctx
             ctx.obj['symbol'] = arguments
-            new_value = update_ticker_symbol_value(conf_obj, ctx.obj)
+            new_value = update_ticker_symbol(conf_obj, ctx.obj)
             if new_value:
                 section[opt_trans] = new_value
                 write_new_value_to_config()

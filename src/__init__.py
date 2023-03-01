@@ -1,5 +1,6 @@
 import logging.config
 import os
+from configparser import ConfigParser
 from dotenv import load_dotenv
 
 
@@ -7,6 +8,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 config_file = os.path.join(BASE_DIR, 'config.ini')
+conf_obj = ConfigParser(converters={'list': lambda x: [i.strip() for i in x.split(',')]})
 
 logger_conf = os.path.join(BASE_DIR, 'logger.ini')
 logging.config.fileConfig(fname=logger_conf)

@@ -3,13 +3,13 @@ from configparser import ConfigParser
 
 import click
 
-from src import config_file
+from src import config_file, conf_obj
 from src.data_service import client
 
 
-conf_obj = ConfigParser(
-    converters={'list': lambda x: [i.strip() for i in x.split(',')]}
-    )
+# conf_obj = ConfigParser(
+#     converters={'list': lambda x: [i.strip() for i in x.split(',')]}
+#     )
 conf_obj.read(config_file)
 
 logger = logging.getLogger(__name__)
@@ -33,7 +33,7 @@ DESCRIPTION
 @click.argument('symbol', nargs=-1, default=None, required=False, type=str)
 
 @click.option('-a', '--alpha', 'opt_trans', flag_value='alpha', help='Fetch data from https://www.alphavantage.co/.')
-@click.option('-t', '--tiingo', 'opt_trans', flag_value='tingo', help='Fetch data from https://api.tiingo.com/.')
+@click.option('-t', '--tiingo', 'opt_trans', flag_value='tiingo', help='Fetch data from https://api.tiingo.com/.')
 
 @click.pass_context
 def cli(ctx, opt_trans, symbol):
@@ -52,7 +52,7 @@ def cli(ctx, opt_trans, symbol):
         ctx.obj['opt_trans'] = opt_trans
         ctx.obj['symbol'] = symbol
 
-        client.get_data(ctx.obj)
+        client.choose_data_provider(ctx.obj)
 
     else:  # print default message
         click.echo(f"""Usage: markdata data [OPTIONS] [SYMBOL]...
