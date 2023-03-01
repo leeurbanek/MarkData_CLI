@@ -2,7 +2,7 @@ import logging
 
 from configparser import ConfigParser
 
-from src import config_file
+from src import alpha_key, config_file
 
 
 conf_obj = ConfigParser(converters={'list': lambda x: [i.strip() for i in x.split(',')]})
@@ -16,6 +16,7 @@ def get_data(ctx):
     debug = ctx['debug']
     symbol = ctx['symbol']
 
+    if debug: logger.debug(f"alpha_key={alpha_key}")
     if debug: logger.debug(f"get_data(ctx={ctx})")
     if not debug: print(f"Saving to '{conf_obj.get('Default', 'chart_dir')}'\nstarting download")
 
