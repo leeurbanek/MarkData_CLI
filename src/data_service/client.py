@@ -1,11 +1,8 @@
 import logging
 
-from configparser import ConfigParser
-
-from src import config_file
+from src import config_file, conf_obj
 
 
-conf_obj = ConfigParser(converters={'list': lambda x: [i.strip() for i in x.split(',')]})
 conf_obj.read(config_file)
 
 logger = logging.getLogger(__name__)
@@ -17,6 +14,7 @@ def choose_data_provider(ctx):
 
     if ctx['opt_trans'] == 'alpha':
         get_alphavantage_data(conf_obj, ctx)
+        print(f"chart_dir={conf_obj.get('Default', 'chart_dir')}")
 
     elif ctx['opt_trans'] == 'tiingo':
         get_tiingo_data(conf_obj, ctx)
