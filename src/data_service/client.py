@@ -1,41 +1,36 @@
 import logging
 
-from src import config_file, conf_obj
-
-
-conf_obj.read(config_file)
 
 logger = logging.getLogger(__name__)
 
 
-def choose_data_provider(ctx):
+def select_data_provider(ctx_obj):
     """"""
-    if ctx['debug']: logger.debug(f"choose_data_provider(ctx={ctx})")
+    if ctx_obj['debug']: logger.debug("select_data_provider(ctx_obj)")
 
-    if ctx['opt_trans'] == 'alpha':
-        get_alphavantage_data(conf_obj, ctx)
-        print(f"chart_dir={conf_obj.get('Default', 'chart_dir')}")
+    if ctx_obj['opt_trans'] == 'alpha':
+        get_alpha_data(ctx_obj)
 
-    elif ctx['opt_trans'] == 'tiingo':
-        get_tiingo_data(conf_obj, ctx)
-
-
-def get_alphavantage_data(conf_obj, ctx_obj):
-    from src.data_service.reader.alpha import AlphaReader
-    data = AlphaReader()
-
-    if ctx_obj['debug']:
-        logger.debug(f"get_alphavantage_data(ctx_obj={ctx_obj})")
-        logger.debug(f"alphavantage key: {data.key}")
+    elif ctx_obj['opt_trans'] == 'tiingo':
+        get_tiingo_data(ctx_obj)
 
 
-def get_tiingo_data(conf_obj, ctx_obj):
-    from src.data_service.reader.tiingo import TiingoReader
-    data = TiingoReader()
+def get_alpha_data(ctx_obj):
+    from src.data_service.reader import AlphaReader
+    reader = AlphaReader()
 
     if ctx_obj['debug']:
-        logger.debug(f"get_tiingo_data(ctx_obj={ctx_obj})")
-        logger.debug(f"tiingo key: {data.key}")
+        logger.debug(f"get_alpha_data(ctxj={ctx_obj})")
+        logger.debug(f"{reader}")
+
+
+def get_tiingo_data(ctx_obj):
+    from src.data_service.reader import TiingoReader
+    reader = TiingoReader()
+
+    if ctx_obj['debug']:
+        logger.debug(f"get_tiingo_data(ctx={ctx_obj})")
+        logger.debug(f"{reader}")
 
 
 def write_to_database():

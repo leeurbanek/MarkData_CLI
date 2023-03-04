@@ -52,7 +52,7 @@ def cli(ctx, opt_trans, symbol):
         ctx.obj['opt_trans'] = opt_trans
         ctx.obj['symbol'] = symbol
 
-        client.choose_data_provider(ctx.obj)
+        client.select_data_provider(ctx.obj)
 
     else:  # print default message
         click.echo(f"""Usage: markdata data [OPTIONS] [SYMBOL]...
