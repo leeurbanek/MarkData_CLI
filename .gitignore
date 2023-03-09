@@ -168,6 +168,7 @@ TODO
 .vscode
 *.code-workspace
 chromedriver
+x*.*
 
 #*.bak
 #*.log
@@ -175,6 +176,5 @@ chromedriver
 #*.sqlite3
 #migrations/
 #app/beta.py
-#x*.*
 #data/
 #*.json
