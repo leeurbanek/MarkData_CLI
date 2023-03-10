@@ -16,23 +16,20 @@ def select_data_provider(ctx_obj):
 
 
 def _get_alpha_data(ctx_obj):
+    if ctx_obj['debug']:
+        logger.debug(f"_get_alpha_data(ctxj={ctx_obj})")
     from src.data_service.reader import AlphaReader
     reader = AlphaReader(
         symbol=ctx_obj['symbol']
     )
-
-    if ctx_obj['debug']:
-        logger.debug(f"_get_alpha_data(ctxj={ctx_obj})")
 
 
 def _get_tiingo_data(ctx_obj):
     if ctx_obj['debug']:
         logger.debug(f"_get_tiingo_data(ctx={ctx_obj})")
     from src.data_service.reader import TiingoReader
+
     reader = TiingoReader(
         symbol=ctx_obj['symbol']
     )
-    print(reader.read())
-
-def write_to_database():
-    pass
+    reader.write_data()
