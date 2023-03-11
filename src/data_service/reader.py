@@ -83,4 +83,15 @@ iwm = [{'date': '2023-03-09T00:00:00.000Z', 'close': 181.41, 'high': 187.27, 'lo
 
 
 if __name__ == '__main__':
-    print("=== test reader ===")
+    print(f"\n=== test reader ===\n{eem}\n")
+
+    for record in eem:
+        row = [
+            record.get('date'),
+            round(record.get('adjOpen')*100),
+            round(record.get('adjHigh')*100),
+            round(record.get('adjLow')*100),
+            round(record.get('adjClose')*100),
+            record.get('adjVolume'),
+        ]
+        print(row)
