@@ -1,3 +1,4 @@
+import json
 import os
 import requests
 
@@ -13,7 +14,6 @@ class AlphaReader(_BaseReader):
     """"""
     def __init__(self, symbol) -> None:
         super().__init__(symbol)
-        self.ticker = ""
         self.key = os.getenv('ALPHA_KEY')
 
 
@@ -21,8 +21,10 @@ class TiingoReader(_BaseReader):
     """"""
     def __init__(self, symbol) -> None:
         super().__init__(symbol)
-        self.ticker = ""
+        self.end = '2023-03-10'
+        self.freq = 'daily'
         self.key = os.getenv('TIINGO_KEY')
+        self.start = '2023-03-09'
 
 
     @property
@@ -39,7 +41,6 @@ class TiingoReader(_BaseReader):
     @property
     def base_url(self):
         """API URL"""
-        # url = f"https://api.tiingo.com/tiingo/daily/{self.ticker}/prices?"
         url = "https://api.tiingo.com/tiingo"
         return url
 
@@ -50,10 +51,10 @@ class TiingoReader(_BaseReader):
             'Authorization': f'Token {self.key}',
         }
         for ticker in self.symbol:
-            self.ticker = ticker
-            # data = requests.get(f"{self.base_url}startDate=2023-03-08&token={self.key}", headers=headers)
-            url = f"{self.base_url}/{self.freq}/{ticker}/prices?startDate={self.start}&endDate={self.end}&token={self.key}"
-            yield url
+            # data = requests.get(f"{self.base_url}/{self.freq}/{ticker}/prices?startDate={self.start}&endDate={self.end}&token={self.key}", headers=headers)
+            data = f"{self.base_url}/{self.freq}/{ticker}/prices?startDate={self.start}&endDate={self.end}&token={self.key}"
+            # yield data.json()
+            yield data
 
     def write_data(self):
         """"""
@@ -76,3 +77,10 @@ class TiingoReader(_BaseReader):
 # }
 # requestResponse = requests.get("https://api.tiingo.com/tiingo/daily/aapl/prices?startDate=2019-01-02&token=Not logged-in or registered. Please login or register to see your API Token", headers=headers)
 # print(requestResponse.json())
+
+eem = [{'date': '2023-03-09T00:00:00.000Z', 'close': 38.04, 'high': 38.58, 'low': 37.96, 'open': 38.51, 'volume': 40118857, 'adjClose': 38.04, 'adjHigh': 38.58, 'adjLow': 37.96, 'adjOpen': 38.51, 'adjVolume': 40118857, 'divCash': 0.0, 'splitFactor': 1.0}, {'date': '2023-03-10T00:00:00.000Z', 'close': 37.84, 'high': 38.25, 'low': 37.8, 'open': 38.02, 'volume': 49316671, 'adjClose': 37.84, 'adjHigh': 38.25, 'adjLow': 37.8, 'adjOpen': 38.02, 'adjVolume': 49316671, 'divCash': 0.0, 'splitFactor': 1.0}]
+iwm = [{'date': '2023-03-09T00:00:00.000Z', 'close': 181.41, 'high': 187.27, 'low': 181.28, 'open': 186.73, 'volume': 33546890, 'adjClose': 181.41, 'adjHigh': 187.27, 'adjLow': 181.28, 'adjOpen': 186.73, 'adjVolume': 33546890, 'divCash': 0.0, 'splitFactor': 1.0}, {'date': '2023-03-10T00:00:00.000Z', 'close': 176.18, 'high': 180.39, 'low': 174.255, 'open': 180.39, 'volume': 67388021, 'adjClose': 176.18, 'adjHigh': 180.39, 'adjLow': 174.255, 'adjOpen': 180.39, 'adjVolume': 67388021, 'divCash': 0.0, 'splitFactor': 1.0}]
+
+
+if __name__ == '__main__':
+    print("=== test reader ===")
