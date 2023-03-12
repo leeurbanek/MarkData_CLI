@@ -20,7 +20,7 @@ def _get_alpha_data(ctx_obj):
         logger.debug(f"_get_alpha_data(ctxj={ctx_obj})")
     from src.data_service.reader import AlphaReader
     reader = AlphaReader(
-        symbol=ctx_obj['symbol']
+        ticker_list=ctx_obj['symbol']
     )
 
 
@@ -30,6 +30,6 @@ def _get_tiingo_data(ctx_obj):
     from src.data_service.reader import TiingoReader
 
     reader = TiingoReader(
-        symbol=ctx_obj['symbol']
+        ticker_list=ctx_obj['symbol']
     )
-    reader.write_data()
+    reader.write_price_data_to_db()

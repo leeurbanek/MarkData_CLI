@@ -12,18 +12,18 @@ load_dotenv()
 
 class AlphaReader(_BaseReader):
     """"""
-    def __init__(self, symbol) -> None:
-        super().__init__(symbol)
-        self.key = os.getenv('ALPHA_KEY')
+    def __init__(self, ticker_list) -> None:
+        super().__init__(ticker_list)
+        self.api_key = os.getenv('ALPHA_KEY')
 
 
 class TiingoReader(_BaseReader):
     """"""
-    def __init__(self, symbol) -> None:
-        super().__init__(symbol)
+    def __init__(self, ticker_list) -> None:
+        super().__init__(ticker_list)
+        self.api_key = os.getenv('TIINGO_KEY')
         self.end = '2023-03-10'
         self.freq = 'daily'
-        self.key = os.getenv('TIINGO_KEY')
         self.start = '2023-03-09'
 
 
@@ -44,25 +44,25 @@ class TiingoReader(_BaseReader):
         url = "https://api.tiingo.com/tiingo"
         return url
 
-    def _read_one_data(self):
+    def _read_one_price_data(self):
         """"""
         headers = {
             'Content-Type': 'application/json',
-            'Authorization': f'Token {self.key}',
+            'Authorization': f'Token {self.api_key}',
         }
-        for ticker in self.symbol:
-            # data = requests.get(f"{self.base_url}/{self.freq}/{ticker}/prices?startDate={self.start}&endDate={self.end}&token={self.key}", headers=headers)
-            data = f"{self.base_url}/{self.freq}/{ticker}/prices?startDate={self.start}&endDate={self.end}&token={self.key}"
-            # yield data.json()
-            yield data
+        for ticker in self.ticker_list:
+            # price = requests.get(f"{self.base_url}/{self.freq}/{ticker}/prices?startDate={self.start}&endDate={self.end}&token={self.api_key}", headers=headers)
+            # yield price.json()
+            price = f"{self.base_url}/{self.freq}/{ticker}/prices?startDate={self.start}&endDate={self.end}&token={self.api_key}"
+            yield ticker, price
 
-    def write_data(self):
+    def write_price_data_to_db(self):
         """"""
-        data = self._read_one_data()
+        price_data = self._read_one_price_data()
 
         while True:
             try:
-                print(f"\nnext() = {next(data)}")
+                print(f"\n{next(price_data)}")
             except StopIteration:
                 break
 
@@ -83,11 +83,13 @@ iwm = [{'date': '2023-03-09T00:00:00.000Z', 'close': 181.41, 'high': 187.27, 'lo
 
 
 if __name__ == '__main__':
-    print(f"\n=== test reader ===\n{eem}\n")
+    from datetime import date
 
-    for record in eem:
+    price_data = eem
+    for record in price_data:
         row = [
-            record.get('date'),
+            'EEM',
+            date(*map(int, record.get('date')[:10].split('-'))),
             round(record.get('adjOpen')*100),
             round(record.get('adjHigh')*100),
             round(record.get('adjLow')*100),
@@ -95,3 +97,80 @@ if __name__ == '__main__':
             record.get('adjVolume'),
         ]
         print(row)
+        print([type(item) for item in row])
+
+# =======
+
+# connector.execute("insert into DATAGERMANY values (NULL,?,?,?,?,?)", *row)
+
+# =======
+
+# import datetime
+# import sqlite3
+
+# # get the current datetime and store it in a variable
+# currentDateTime = datetime.datetime.now()
+
+# # make the database connection with detect_types
+# connection = sqlite3.connect(
+#     'StudentAssignment.db',
+#     detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES
+# )
+# cursor = connection.cursor()
+
+# # create table in database
+# createTable = '''CREATE TABLE ASSIGNMENT (
+# 	StudentId INTEGER,
+# 	StudentName VARCHAR(100),
+# 	SubmissionDate TIMESTAMP);'''
+# cursor.execute(createTable)
+
+# # create query to insert the data
+# insertQuery = """INSERT INTO ASSIGNMENT
+# 	VALUES (?, ?, ?);"""
+
+# # insert the data into table
+# cursor.execute(insertQuery, (1, "Virat Kohli",
+# 							currentDateTime))
+# cursor.execute(insertQuery, (2, "Rohit Pathak",
+# 							currentDateTime))
+# print("Data Inserted Successfully !")
+
+# # commit the changes,
+# # close the cursor and database connection
+# connection.commit()
+# cursor.close()
+# connection.close()
+
+# =======
+
+# import datetime
+# import sqlite3
+
+# make a database connection and cursor object
+# connection = sqlite3.connect(
+#     'StudentAssignment.db',
+#     detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES
+# )
+# cursor = connection.cursor()
+
+# # select query to retrieve data
+# cursor.execute("SELECT * from ASSIGNMENT where StudentId = 2")
+# fetchedData = cursor.fetchall()
+
+# # to access specific fetched data
+# for row in fetchedData:
+# 	StudentID = row[0]
+# 	StudentName = row[1]
+# 	SubmissionDate = row[2]
+# 	print(StudentName, ", ID -",
+# 		StudentID, "Submitted Assignments")
+# 	print("Date and Time : ",
+# 		SubmissionDate)
+# 	print("Submission date type is",
+# 		type(SubmissionDate))
+
+# # commit the changes,
+# # close the cursor and database connection
+# cursor.close()
+# connection.close()
