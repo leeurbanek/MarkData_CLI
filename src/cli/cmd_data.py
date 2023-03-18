@@ -52,7 +52,11 @@ def cli(ctx, opt_trans, symbol):
         ctx.obj['opt_trans'] = opt_trans
         ctx.obj['symbol'] = symbol
 
-        client.select_data_provider(ctx.obj)
+        # select data provider
+        if opt_trans == 'alpha':
+            client.get_alpha_data(ctx.obj)
+        elif opt_trans == 'tiingo':
+            client.read_tiingo_data(ctx.obj)
 
     else:  # print default message
         click.echo(f"""Usage: markdata data [OPTIONS] [SYMBOL]...

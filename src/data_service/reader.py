@@ -44,6 +44,10 @@ class TiingoReader(_BaseReader):
         url = "https://api.tiingo.com/tiingo"
         return url
 
+    def _convert_json_to_list(self):
+        """"""
+        pass
+
     def _read_one_price_data(self):
         """"""
         headers = {
@@ -56,13 +60,13 @@ class TiingoReader(_BaseReader):
             price = f"{self.base_url}/{self.freq}/{ticker}/prices?startDate={self.start}&endDate={self.end}&token={self.api_key}"
             yield ticker, price
 
-    def write_price_data_to_db(self):
+    def parse_price_data(self):
         """"""
-        price_data = self._read_one_price_data()
+        json_data = self._read_one_price_data()
 
         while True:
             try:
-                print(f"\n{next(price_data)}")
+                print(f"\n{next(json_data)}")
             except StopIteration:
                 break
 
@@ -85,8 +89,8 @@ iwm = [{'date': '2023-03-09T00:00:00.000Z', 'close': 181.41, 'high': 187.27, 'lo
 if __name__ == '__main__':
     from datetime import date
 
-    price_data = eem
-    for record in price_data:
+    json_data = eem
+    for record in json_data:
         row = [
             'EEM',
             date(*map(int, record.get('date')[:10].split('-'))),
