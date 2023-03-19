@@ -2,12 +2,12 @@
 
 class _BaseReader():
     """"""
-    def __init__(self, ticker_list, api_key=None, end=None, freq=None, start=None) -> None:
+    def __init__(self, api_key=None, end=None, freq=None, start=None, symbol=None) -> None:
         self.api_key = api_key
         self.end = end
         self.freq = freq
         self.start = start
-        self.ticker_list = ticker_list
+        self.symbol = symbol
 
     @property
     def params(self):
