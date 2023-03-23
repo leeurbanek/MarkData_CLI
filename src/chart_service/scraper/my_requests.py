@@ -9,7 +9,7 @@ from PIL import Image
 from requests_html import HTMLSession
 
 from src import config_file
-from src.utils import SpinnerManager
+from src.ctx_mgr import SpinnerManager
 
 
 conf_obj = ConfigParser()
