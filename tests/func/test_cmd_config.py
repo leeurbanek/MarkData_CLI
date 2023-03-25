@@ -25,7 +25,7 @@ class TestConfigMainCLI(unittest.TestCase):
         self.assertEqual(0, result.exit_code)
 
     def test_config_chart_dir_aborted(self):
-        result = self.runner.invoke(main_cli, 'config --chart-dir', input='N')
+        result = self.runner.invoke(main_cli, 'config --work-dir', input='N')
         self.assertIn('Aborted!', result.output)
         self.assertEqual(1, result.exit_code)
 

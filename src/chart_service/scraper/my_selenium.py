@@ -22,7 +22,7 @@ logging.getLogger('urllib3').setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 
 BASE_URL = conf_obj['Scraper']['base_url']
-CHART_DIR = conf_obj['Default']['chart_dir']
+WORK_DIR = conf_obj['Default']['work_dir']
 
 
 class WebScraper:
@@ -70,7 +70,7 @@ class WebScraper:
 
         image_file = io.BytesIO(src_content)
         image = Image.open(image_file).convert('RGB')
-        image.save(os.path.join(CHART_DIR, f'{self.symbol}_{self.period.lower()}.png'), 'PNG', quality=80)
+        image.save(os.path.join(WORK_DIR, f'{self.symbol}_{self.period.lower()}.png'), 'PNG', quality=80)
 
     def _set_chart_page(self, driver):
         """"""

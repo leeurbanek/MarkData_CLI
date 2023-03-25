@@ -1,24 +1,22 @@
 import logging
 import os
-# from configparser import ConfigParser
 
 import click
 
 from src import config_file, conf_obj
 
 
-# conf_obj = ConfigParser(converters={'list': lambda x: [i.strip() for i in x.split(',')]})
 conf_obj.read(config_file)
 
 logger = logging.getLogger(__name__)
 
 
-def update_default_chart_dir(conf_obj, ctx_obj):
+def update_default_db_path(conf_obj, ctx_obj):
     """"""
     if ctx_obj['debug']:
-        logger.debug(f"update_default_chart_dir(section={ctx_obj['section']}, opt_trans={ctx_obj['opt_trans']})")
+        logger.debug(f"update_default_db_path(section={ctx_obj['section']}, opt_trans={ctx_obj['opt_trans']})")
 
-    current = f"{conf_obj.get('Default', 'chart_dir')}"
+    current = f"{conf_obj.get('Default', 'db_path')}"
     click.confirm(
         f"Current {ctx_obj['opt_trans']}: '{current}'\nDo you want to change this?", abort=True
         )
@@ -36,12 +34,12 @@ def update_default_chart_dir(conf_obj, ctx_obj):
             print(f"OSError '{new_value}': try using absolute path to chart directory.")
 
 
-def update_default_db_path(conf_obj, ctx_obj):
+def update_default_work_dir(conf_obj, ctx_obj):
     """"""
     if ctx_obj['debug']:
-        logger.debug(f"update_default_db_path(section={ctx_obj['section']}, opt_trans={ctx_obj['opt_trans']})")
+        logger.debug(f"update_default_work_dir(section={ctx_obj['section']}, opt_trans={ctx_obj['opt_trans']})")
 
-    current = f"{conf_obj.get('Default', 'db_path')}"
+    current = f"{conf_obj.get('Default', 'work_dir')}"
     click.confirm(
         f"Current {ctx_obj['opt_trans']}: '{current}'\nDo you want to change this?", abort=True
         )
@@ -122,12 +120,6 @@ DESCRIPTION
 
 @click.argument('arguments', nargs=-1, default=None, required=False, type=str)
 
-# config Chart
-@click.option(
-    '-c', '--chart-dir', 'opt_trans', flag_value='chart_dir',
-    help=f"Change chart directory, current: '{conf_obj.get('Default', 'chart_dir')}'"
-)
-
 # config Data
 @click.option(
     '--create-db', 'opt_trans', flag_value='create_db',
@@ -144,6 +136,13 @@ DESCRIPTION
     help=f"Add/remove ticker symbols, current: '{conf_obj.get('Ticker', 'symbol')}'"
 )
 
+# config Work directory
+@click.option(
+    '-w', '--work-dir', 'opt_trans', flag_value='work_dir',
+    help=f"Change working directory, current: '{conf_obj.get('Default', 'work_dir')}'"
+)
+
+
 
 @click.pass_context
 def cli(ctx, opt_trans, arguments):
@@ -154,10 +153,10 @@ def cli(ctx, opt_trans, arguments):
     if opt_trans:
         ctx.obj['opt_trans'] = opt_trans  # add opt_trans to ctx
 
-        if opt_trans == 'chart_dir':
+        if opt_trans == 'work_dir':
             section = conf_obj['Default']
             ctx.obj['section'] = section  # add section to ctx
-            new_value = update_default_chart_dir(conf_obj, ctx.obj)
+            new_value = update_default_work_dir(conf_obj, ctx.obj)
             if new_value:
                 section[opt_trans] = new_value
                 write_new_value_to_config()

@@ -22,10 +22,10 @@ def get_chart(ctx):
     symbol = ctx['symbol']
 
     if debug: logger.debug(f"get_chart(ctx={ctx})")
-    if not debug: print(f"Saving to '{conf_obj.get('Default', 'chart_dir')}'\nstarting download")
+    if not debug: print(f"Saving to '{conf_obj.get('Default', 'work_dir')}'\nstarting download")
 
     # count = len(period) * len(symbol)
-    [download(debug, p, s) for p in period for s in symbol]
+    [download(debug, p, s.strip(',')) for p in period for s in symbol]
     if not debug: print('cleaning up... ', end='')
     if not debug: print('\b finished.')
 
