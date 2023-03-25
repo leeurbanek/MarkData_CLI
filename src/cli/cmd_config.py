@@ -36,6 +36,29 @@ def update_default_chart_dir(conf_obj, ctx_obj):
             print(f"OSError '{new_value}': try using absolute path to chart directory.")
 
 
+def update_default_db_path(conf_obj, ctx_obj):
+    """"""
+    if ctx_obj['debug']:
+        logger.debug(f"update_default_db_path(section={ctx_obj['section']}, opt_trans={ctx_obj['opt_trans']})")
+
+    current = f"{conf_obj.get('Default', 'db_path')}"
+    click.confirm(
+        f"Current {ctx_obj['opt_trans']}: '{current}'\nDo you want to change this?", abort=True
+        )
+    new_value =  click.prompt(f"Please enter a valid {ctx_obj['opt_trans']}", type=str)
+    if os.path.exists(f"{new_value}"):
+        click.confirm(
+            f"WARNING: '{new_value}' directory exists, cannot create.\n\tUse '{new_value}' anyway?", abort=True
+            )
+        return new_value
+    else:
+        try:
+            os.makedirs(f"{new_value}")
+            return new_value
+        except:
+            print(f"OSError '{new_value}': try using absolute path to chart directory.")
+
+
 def update_ticker_symbol(conf_obj, ctx_obj):
     """"""
     if ctx_obj['debug']:
@@ -103,13 +126,23 @@ DESCRIPTION
 @click.option(
     '-c', '--chart-dir', 'opt_trans', flag_value='chart_dir',
     help=f"Change chart directory, current: '{conf_obj.get('Default', 'chart_dir')}'"
-    )
+)
+
+# config Data
+@click.option(
+    '--create-db', 'opt_trans', flag_value='create_db',
+    help=f"Create new database, current: {conf_obj.get('Default', 'database')}"
+)
+@click.option(
+    '--db-path', 'opt_trans', flag_value='db_path',
+    help=f"Change database path, current: '{conf_obj.get('Default', 'db_path')}"
+)
 
 # config Ticker
 @click.option(
     '-s', '--symbol', 'opt_trans', flag_value='symbol',
     help=f"Add/remove ticker symbols, current: '{conf_obj.get('Ticker', 'symbol')}'"
-    )
+)
 
 
 @click.pass_context
@@ -120,6 +153,7 @@ def cli(ctx, opt_trans, arguments):
 
     if opt_trans:
         ctx.obj['opt_trans'] = opt_trans  # add opt_trans to ctx
+
         if opt_trans == 'chart_dir':
             section = conf_obj['Default']
             ctx.obj['section'] = section  # add section to ctx
@@ -127,6 +161,15 @@ def cli(ctx, opt_trans, arguments):
             if new_value:
                 section[opt_trans] = new_value
                 write_new_value_to_config()
+
+        elif opt_trans == 'db_path':
+            section = conf_obj['Default']
+            ctx.obj['section'] = section  # add section to ctx
+            new_value = update_default_db_path(conf_obj, ctx.obj)
+            if new_value:
+                section[opt_trans] = new_value
+                write_new_value_to_config()
+
         elif opt_trans == 'symbol':
             section = conf_obj['Ticker']
             ctx.obj['section'] = section  # add section to ctx
