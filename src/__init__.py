@@ -4,14 +4,13 @@ from configparser import ConfigParser
 from dotenv import load_dotenv
 
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+config_file = os.path.join(base_dir, 'config.ini')
 
-
-config_file = os.path.join(BASE_DIR, 'config.ini')
 # Create getlist() converter, used in cmd_config.py for ticker symbols
 conf_obj = ConfigParser(converters={'list': lambda x: [i.strip() for i in x.split(',')]})
 
-logger_conf = os.path.join(BASE_DIR, 'logger.ini')
+logger_conf = os.path.join(base_dir, 'logger.ini')
 logging.config.fileConfig(fname=logger_conf)
 
 

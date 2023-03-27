@@ -48,6 +48,7 @@ class DatabaseConnectionManager:
             self.connection = sqlite3.connect(
                 f'file:{os.path.abspath(self.db_path)}?mode={self.mode}',
                 detect_types=sqlite3.PARSE_DECLTYPES, uri=True
+                # detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES, uri=True
             )
             self.cursor = self.connection.cursor()
             print(f"connected {os.path.basename(self.db_path)}, mode: {self.mode}")
