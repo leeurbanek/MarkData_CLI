@@ -53,7 +53,7 @@ def cli(ctx, opt_trans, symbol):
         if opt_trans == 'alpha':
             client.get_alpha_data(ctx.obj)
         elif opt_trans == 'tiingo':
-            client.get_tiingo_data(ctx.obj)
+            client.get_tiingo_data(conf_obj=conf_obj, ctx_obj=ctx.obj)
 
     else:  # print default message
         click.echo(f"""Usage: markdata data [OPTIONS] [SYMBOL]...

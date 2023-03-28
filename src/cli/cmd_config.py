@@ -16,11 +16,11 @@ def create_database(conf_obj, ctx_obj):
     """"""
     if ctx_obj['debug']:
         logger.debug(f"create_database(section={ctx_obj['section']}, opt_trans={ctx_obj['opt_trans']})")
-    current = f"{conf_obj.get('Default', 'database')}"
-    print(f"current database: {conf_obj.get('Default', 'work_dir')}/{current}")
-    with DatabaseConnectionManager('temp/db.sqlite', 'rwc') as db_con:
-        print(f"db_con: {db_con}")
-        _create_table(ctx_obj)
+
+    click.confirm(
+        f"Current database: '{conf_obj.get('Default', 'work_dir')}/{conf_obj.get('Default', 'database')}'\nDo you want to change this?", abort=True
+    )
+    raise NotImplementedError()
 
 
 def _create_table(ctx_obj):

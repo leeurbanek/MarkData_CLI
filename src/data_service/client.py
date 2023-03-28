@@ -13,7 +13,7 @@ def get_alpha_data(ctx_obj):
     print(f"reader: {reader}")
 
 
-def get_tiingo_data(ctx_obj):
+def get_tiingo_data(conf_obj, ctx_obj):
     """"""
     if ctx_obj['debug']:
         logger.debug(f"get_tiingo_data(ctx={ctx_obj})")
@@ -22,9 +22,14 @@ def get_tiingo_data(ctx_obj):
     reader = TiingoReader()
     for symbol in ctx_obj['symbol']:
         data_list = reader.parse_price_data(symbol)
-        _write_data_to_sqlite_db(data_list)
+        _write_data_to_sqlite_db(conf_obj, ctx_obj, data_list)
 
 
-def _write_data_to_sqlite_db(data_list):
+def _write_data_to_sqlite_db(conf_obj, ctx_obj, data_list):
     """"""
-    print(f"data_list: {data_list}")
+    if ctx_obj['debug']:
+        logger.debug(f"_write_data_to_sqlite_db(data_list={data_list})")
+
+    print(f"database: {ctx_obj['Default']['database']}")
+    if not conf_obj.get('Default', 'database'):
+        print('no database')
