@@ -29,6 +29,12 @@ def _create_table(ctx_obj):
         logger.debug(f"_create_table(ctx_obj={ctx_obj})")
 
 
+def delete_database(conf_obj, ctx_obj):
+    """"""
+    if ctx_obj['debug']:
+        logger.debug(f"delete_database(ctx_obj={ctx_obj['opt_trans']})")
+
+
 def update_default_work_dir(conf_obj, ctx_obj):
     """"""
     if ctx_obj['debug']:
