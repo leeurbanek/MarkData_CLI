@@ -1,5 +1,7 @@
 import logging
 
+import click
+
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +32,12 @@ def _write_data_to_sqlite_db(conf_obj, ctx_obj, data_list):
     if ctx_obj['debug']:
         logger.debug(f"_write_data_to_sqlite_db(data_list={data_list})")
 
-    print(f"database: {ctx_obj['Default']['database']}")
     if not conf_obj.get('Default', 'database'):
-        print('no database')
+        if not conf_obj.get('Default', 'work_dir'):
+            click.echo("""no directory")
+Try 'markdata config --help' for help.""")
+        else:
+            click.echo("create the database")
+
+#         click.echo(f"""Usage: markdata chart [OPTIONS] [SYMBOL]...
+# Try 'markdata chart --help' for help.""")
