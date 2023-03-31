@@ -35,18 +35,27 @@ def get_tiingo_data(conf_obj, ctx_obj):
         _write_data_to_sqlite_db(conf_obj, ctx_obj, data_list)
 
 
+def _value(conf_obj, value):
+    """"""
+    v = conf_obj.get('Default', value)
+    return None if v == 'None' else v
+
+
 def _write_data_to_sqlite_db(conf_obj, ctx_obj, data_list):
     """"""
     if ctx_obj['debug']:
         logger.debug(f"_write_data_to_sqlite_db(data_list={data_list})")
 
-    if not conf_obj.get('Default', 'database'):
-        if not conf_obj.get('Default', 'work_dir'):
-            click.echo("Error: Work directory not set\nTry 'markdata config --help' for help.")
-            return
-        else:
-            _create_database(ctx_obj)
+    # if not _value(conf_obj, 'work_dir'):
+    if ctx_obj['Default']['work_dir']:
+        click.echo("Error: Work directory not set\nTry 'markdata config --help' for help.")
+        return
 
-    db_path = f"{conf_obj.get('Default', 'work_dir')}/db.sqlite"
-    with DatabaseConnectionManager(db_path=db_path, mode='rwc') as db_con:
-        print(f"db_con: {db_con}")
+    if not _value(conf_obj, 'database'):
+    # if ctx_obj['Default']['database'] == 'None':
+        print("no database")
+
+"""
+
+
+"""

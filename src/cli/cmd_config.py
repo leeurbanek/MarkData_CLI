@@ -12,50 +12,10 @@ conf_obj.read(config_file)
 logger = logging.getLogger(__name__)
 
 
-def create_database(conf_obj, ctx_obj):
-    """"""
-    if ctx_obj['debug']:
-        logger.debug(f"create_database(section={ctx_obj['section']}, opt_trans={ctx_obj['opt_trans']})")
-
-    click.confirm(
-        f"Current database: '{conf_obj.get('Default', 'work_dir')}/{conf_obj.get('Default', 'database')}'\nDo you want to change this?", abort=True
-    )
-    raise NotImplementedError()
-
-
-def _create_table(ctx_obj):
-    """"""
-    if ctx_obj['debug']:
-        logger.debug(f"_create_table(ctx_obj={ctx_obj})")
-
-
 def delete_database(conf_obj, ctx_obj):
     """"""
     if ctx_obj['debug']:
         logger.debug(f"delete_database(ctx_obj={ctx_obj['opt_trans']})")
-
-
-def update_default_work_dir(conf_obj, ctx_obj):
-    """"""
-    if ctx_obj['debug']:
-        logger.debug(f"update_default_work_dir(section={ctx_obj['section']}, opt_trans={ctx_obj['opt_trans']})")
-
-    current = f"{conf_obj.get('Default', 'work_dir')}"
-    click.confirm(
-        f"Current {ctx_obj['opt_trans']}: '{current}'\nDo you want to change this?", abort=True
-        )
-    new_value =  click.prompt(f"Please enter a valid {ctx_obj['opt_trans']}", type=str)
-    if os.path.exists(f"{new_value}"):
-        click.confirm(
-            f"WARNING: '{new_value}' directory exists, cannot create.\n\tUse '{new_value}' anyway?", abort=True
-            )
-        return new_value
-    else:
-        try:
-            os.makedirs(f"{new_value}")
-            return new_value
-        except:
-            print(f"OSError '{new_value}': try using absolute path to chart directory.")
 
 
 def update_ticker_symbol(conf_obj, ctx_obj):
@@ -99,6 +59,30 @@ def update_ticker_symbol(conf_obj, ctx_obj):
     return new_value
 
 
+def update_work_dir(conf_obj, ctx_obj):
+    """"""
+    if ctx_obj['debug']:
+        logger.debug(f"update_work_dir(section={ctx_obj['section']}, opt_trans={ctx_obj['opt_trans']})")
+
+    current = f"{conf_obj.get('Default', 'work_dir')}"
+    click.confirm(
+        f"Current {ctx_obj['opt_trans']}: '{current}'\nDo you want to change this?", abort=True
+        )
+    new_value =  click.prompt(f"Please enter a valid {ctx_obj['opt_trans']}", type=str)
+
+    if os.path.exists(f"{new_value}"):
+        click.confirm(
+            f"WARNING: '{new_value}' directory exists, cannot create.\n\tUse '{new_value}' anyway?", abort=True
+            )
+        return new_value
+    else:
+        try:
+            os.makedirs(f"{new_value}")
+            return new_value
+        except:
+            print(f"OSError '{new_value}': try using absolute path to chart directory.")
+
+
 def write_new_value_to_config():
     """Write new value to config.ini"""
     with open(config_file, 'w') as f:
@@ -123,7 +107,7 @@ DESCRIPTION
 
 # config Data
 @click.option(
-    '--create-db', 'opt_trans', flag_value='create_db',
+    '--database', 'opt_trans', flag_value='database',
     help=f"Create new database, current: {conf_obj.get('Default', 'database')}"
 )
 
@@ -150,10 +134,16 @@ def cli(ctx, opt_trans, arguments):
     if opt_trans:
         ctx.obj['opt_trans'] = opt_trans  # add opt_trans to ctx
 
-        if opt_trans == 'create_db':
+        if opt_trans == 'database':
             section = conf_obj['Default']
             ctx.obj['section'] = section  # add section to ctx
-            create_database(conf_obj, ctx.obj)
+            click.confirm(
+                f"Current database: '{ctx.obj['Default']['work_dir']}/{ctx.obj['Default']['database']}'\nDo you want to change this?", abort=True
+            )
+            new_value =  click.prompt(f"Enter the new {ctx.obj['opt_trans']} name", type=str)
+            if new_value:
+                section[opt_trans] = new_value
+                write_new_value_to_config()
 
         elif opt_trans == 'symbol':
             section = conf_obj['Ticker']
@@ -167,7 +157,7 @@ def cli(ctx, opt_trans, arguments):
         elif opt_trans == 'work_dir':
             section = conf_obj['Default']
             ctx.obj['section'] = section  # add section to ctx
-            new_value = update_default_work_dir(conf_obj, ctx.obj)
+            new_value = update_work_dir(conf_obj, ctx.obj)
             if new_value:
                 section[opt_trans] = new_value
                 write_new_value_to_config()
