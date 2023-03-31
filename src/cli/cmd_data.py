@@ -4,12 +4,51 @@ from configparser import ConfigParser
 import click
 
 from src import config_file, conf_obj
+from src.ctx_mgr import DatabaseConnectionManager
 from src.data_service import client
-
 
 conf_obj.read(config_file)
 
 logger = logging.getLogger(__name__)
+
+
+def _add_ohlc_table(ctx_obj, db_con):
+    """"""
+    if ctx_obj['debug']:
+        logger.debug(f"_add_ohlc_table(db_con={db_con})")
+
+# def add_ohlc_table(db_con, table_name):
+#     """Create the Open, High, Low, Close, AdjCl, Volume table.
+#     --------------------------------------------------------
+#     Data is adjusted daily historical from Alpha Vantage.\n
+#     See https://www.alphavantage.co/documentation/#dailyadj.\n
+#     Fields are Date, Open, High, Low, Close, AdjCl, Volume.\n
+#     Parameters
+#     ----------
+#     `db_con` : sqlite3.Connection object
+#         Connection to the time series database.\n
+#     `table_name` : string
+#         Name of the table to create.\n
+#     """
+#     db_con.execute(f'''
+#         CREATE TABLE IF NOT EXISTS {table_name} (
+#             Date     DATE     NOT NULL,
+#             Open     INTEGER  NOT NULL,
+#             High     INTEGER  NOT NULL,
+#             Low      INTEGER  NOT NULL,
+#             Close    INTEGER  NOT NULL,
+#             AdjCl    INTEGER  NOT NULL,
+#             Volume   INTEGER  NOT NULL,
+#             PRIMARY  KEY (Date));
+#         ''')
+# =======
+
+# # create table in database
+# createTable = '''CREATE TABLE ASSIGNMENT (
+# 	StudentId INTEGER,
+# 	StudentName VARCHAR(100),
+# 	SubmissionDate TIMESTAMP);'''
+# cursor.execute(createTable)
 
 
 @click.command('data', short_help="Fetch online OHLC price and volume data", help="""
@@ -46,6 +85,9 @@ def cli(ctx, opt_trans, symbol):
         if ctx.obj['Default']['database'] == 'None':
             click.echo("Error: The database name is not set\nTry 'markdata config --help' for help.")
             return
+        # create database and add talbe if not exist
+        with DatabaseConnectionManager(db_path=f"{ctx.obj['Default']['work_dir']}/{ctx.obj['Default']['database']}", mode='rwc') as db_con:
+            _add_ohlc_table(ctx_obj=ctx.obj, db_con=db_con)
 
         if symbol:  # use symbols from command line input
             symbol = [s.upper() for s in list(symbol)]
@@ -67,10 +109,3 @@ def cli(ctx, opt_trans, symbol):
 Try 'markdata data --help' for help.""")
 
 # subprocess.run(['open', filename], check=True)
-
-    # if not ctx_obj['Default']['work_dir']:
-    #     click.echo("Error: Work directory not set\nTry 'markdata config --help' for help.")
-    #     return
-
-    # if ctx_obj['Default']['database'] == 'None':
-    #     click.echo("Error: The database name is not set\nTry 'markdata config --help' for help.")
