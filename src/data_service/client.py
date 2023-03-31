@@ -1,7 +1,5 @@
 import logging
 
-import click
-
 from src.ctx_mgr import DatabaseConnectionManager
 
 
@@ -32,7 +30,7 @@ def get_tiingo_data(conf_obj, ctx_obj):
     reader = TiingoReader()
     for symbol in ctx_obj['symbol']:
         data_list = reader.parse_price_data(symbol)
-        _write_data_to_sqlite_db(conf_obj, ctx_obj, data_list)
+        _write_data_to_sqlite_db(ctx_obj, data_list)
 
 
 def _value(conf_obj, value):
@@ -41,21 +39,12 @@ def _value(conf_obj, value):
     return None if v == 'None' else v
 
 
-def _write_data_to_sqlite_db(conf_obj, ctx_obj, data_list):
+def _write_data_to_sqlite_db(ctx_obj, data_list):
     """"""
     if ctx_obj['debug']:
         logger.debug(f"_write_data_to_sqlite_db(data_list={data_list})")
 
-    # if not _value(conf_obj, 'work_dir'):
-    if ctx_obj['Default']['work_dir']:
-        click.echo("Error: Work directory not set\nTry 'markdata config --help' for help.")
-        return
-
-    if not _value(conf_obj, 'database'):
-    # if ctx_obj['Default']['database'] == 'None':
-        print("no database")
-
-"""
-
-
-"""
+    with DatabaseConnectionManager(
+        db_path=f"{ctx_obj['Default']['work_dir']}/{ctx_obj['Default']['database']}", mode='rwc'
+    ) as db_con:
+        print(f"db_con={db_con}")

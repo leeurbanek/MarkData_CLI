@@ -39,6 +39,13 @@ def cli(ctx, opt_trans, symbol):
         logger.debug(f"cli(ctx, opt_trans={opt_trans}, symbol={symbol })")
 
     if opt_trans:
+        # check if defaults are set
+        if ctx.obj['Default']['work_dir'] == 'None':
+            click.echo("Error: Work directory not set\nTry 'markdata config --help' for help.")
+            return
+        if ctx.obj['Default']['database'] == 'None':
+            click.echo("Error: The database name is not set\nTry 'markdata config --help' for help.")
+            return
 
         if symbol:  # use symbols from command line input
             symbol = [s.upper() for s in list(symbol)]
@@ -60,3 +67,10 @@ def cli(ctx, opt_trans, symbol):
 Try 'markdata data --help' for help.""")
 
 # subprocess.run(['open', filename], check=True)
+
+    # if not ctx_obj['Default']['work_dir']:
+    #     click.echo("Error: Work directory not set\nTry 'markdata config --help' for help.")
+    #     return
+
+    # if ctx_obj['Default']['database'] == 'None':
+    #     click.echo("Error: The database name is not set\nTry 'markdata config --help' for help.")
