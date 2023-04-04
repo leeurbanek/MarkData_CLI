@@ -41,14 +41,6 @@ def _add_ohlc_table(ctx_obj, db_con):
 #             Volume   INTEGER  NOT NULL,
 #             PRIMARY  KEY (Date));
 #         ''')
-# =======
-
-# # create table in database
-# createTable = '''CREATE TABLE ASSIGNMENT (
-# 	StudentId INTEGER,
-# 	StudentName VARCHAR(100),
-# 	SubmissionDate TIMESTAMP);'''
-# cursor.execute(createTable)
 
 # =======
 
