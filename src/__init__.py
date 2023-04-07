@@ -21,3 +21,20 @@ try:
     tiingo_key = os.getenv('TIINGO_KEY')
 except:
     pass
+
+
+def none_value(conf_obj, key='Default', value=None):
+    """Convert string 'None' to None type
+    ----------------------------------
+    Parse 'None' strings in config.ini to Python None type.\n
+    Parameters
+    ----------
+    `ctx_obj` : dictionary
+        Python Click context object.\n
+    `key` : string
+        config.ini section name.\n
+    `value` : string
+        Config parameter name.\n
+    """
+    v = conf_obj.get(key, value)
+    return None if v == 'None' else v
