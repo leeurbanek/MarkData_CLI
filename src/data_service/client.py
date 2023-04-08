@@ -41,5 +41,5 @@ def _write_data_to_sqlite_db(ctx_obj, data_list):
 
 
 if __name__ == '__main__':
-    ctx_obj = {'Default': {'work_dir': 'temp', 'database': 'db.sqlite'}, 'Scraper': {'adblock': 'None', 'base_url': 'https://stockcharts.com/h-sc/ui?s=', 'driver': 'chromedriver'}, 'Ticker': {'symbol': 'EEM, IWM'}, 'debug': True, 'opt_trans': 'tiingo', 'symbol': ['IWM']}
+    ctx_obj = {'Default': {'work_dir': 'temp'}, 'Data': {'database': 'db.sqlite'}, 'Scraper': {'adblock': 'None', 'base_url': 'https://stockcharts.com/h-sc/ui?s=', 'driver': 'chromedriver'}, 'Ticker': {'symbol': 'EEM, IWM'}, 'debug': True, 'opt_trans': 'tiingo', 'symbol': ['IWM']}
     get_tiingo_data(ctx_obj)

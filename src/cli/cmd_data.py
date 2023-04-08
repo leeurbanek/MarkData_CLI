@@ -12,7 +12,7 @@ conf_obj.read(config_file)
 logger = logging.getLogger(__name__)
 
 
-def _add_ohlc_table(conf_obj, ctx_obj, db_con, table_name=None):
+def _add_ohlc_table(conf_obj, ctx_obj, db_con):
     """Create the Open, High, Low, Close, AdjCl, Volume table.
     --------------------------------------------------------
     Fields are Date, Symbol, Open, High, Low, Close, Volume.\n

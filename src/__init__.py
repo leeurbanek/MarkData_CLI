@@ -23,6 +23,11 @@ except:
     pass
 
 
+__all__ = [
+    "none_value",
+]
+
+
 def none_value(conf_obj, key='Default', value=None):
     """Convert string 'None' to None type
     ----------------------------------
@@ -37,4 +42,4 @@ def none_value(conf_obj, key='Default', value=None):
         Config parameter name.\n
     """
     v = conf_obj.get(key, value)
-    return None if v == 'None' else v
+    return None if v == ('None' or '') else v
