@@ -24,11 +24,11 @@ except:
 
 
 __all__ = [
-    "none_value",
+    "_none_value",
 ]
 
 
-def none_value(conf_obj, key='Default', value=None):
+def _none_value(conf_obj, key='Default', value=None):
     """Convert string 'None' to None type
     ----------------------------------
     Parse 'None' strings in config.ini to Python None type.\n
