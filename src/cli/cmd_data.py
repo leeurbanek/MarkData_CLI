@@ -1,4 +1,5 @@
 import logging
+import os.path
 from configparser import ConfigParser
 
 import click
@@ -76,8 +77,9 @@ def cli(ctx, opt_trans, symbol):
             click.echo("Error: The database name is not set\nTry 'markdata config --help' for help.")
             return
         # create database and add talbe if not exist
-        with DatabaseConnectionManager(db_path=f"{ctx.obj['Default']['work_dir']}/{ctx.obj['Default']['database']}", mode='rwc') as db_con:
-            _add_ohlc_table(conf_obj=ctx.obj, ctx_obj=ctx.obj, db_con=db_con)
+        if not os.path.exists(f"{ctx.obj['Default']['work_dir']}/{ctx.obj['Default']['database']}"):
+            with DatabaseConnectionManager(db_path=f"{ctx.obj['Default']['work_dir']}/{ctx.obj['Default']['database']}", mode='rwc') as db_con:
+                _add_ohlc_table(conf_obj=ctx.obj, ctx_obj=ctx.obj, db_con=db_con)
 
         if symbol:  # use symbols from command line input
             symbol = [s.upper() for s in list(symbol)]

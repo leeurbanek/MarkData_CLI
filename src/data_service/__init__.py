@@ -1,4 +1,12 @@
-""""""
+"""src.data_service.__init__.py"""
+import logging
+
+from src.ctx_mgr import DatabaseConnectionManager
+
+
+logging.getLogger('unittest').setLevel(logging.WARNING)
+logger = logging.getLogger(__name__)
+
 
 class _BaseReader():
     """"""
@@ -20,6 +28,17 @@ class _BaseReader():
         # must be overridden in subclass
         raise NotImplementedError
 
+
+def _sanitize_dates(ctx_obj):
+    """"""
+    if ctx_obj['debug']:
+        logger.debug(f"_sanitize_dates(ctx_obj={ctx_obj})")
+
+    # f"SELECT Date FROM {table_name} WHERE ROWID IN (SELECT max(ROWID) FROM {table_name});"
+    start, end = None, None
+    return start, end
+
+# =======
 
 # import datetime as dt
 

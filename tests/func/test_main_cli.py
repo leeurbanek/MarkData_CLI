@@ -1,3 +1,4 @@
+import logging
 import unittest
 
 from click.testing import CliRunner
@@ -8,9 +9,11 @@ from src.run import main_cli
 class TestClickBasicSetup(unittest.TestCase):
 
     def setUp(self) -> None:
+        logging.disable(logging.CRITICAL)
         self.runner = CliRunner()
 
     def tearDown(self) -> None:
+        logging.disable(logging.NOTSET)
         del self.runner
 
     def test_main_help_exists(self):
