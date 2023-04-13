@@ -23,9 +23,7 @@ class TiingoReader(_BaseReader):
     def __init__(self) -> None:
         super().__init__()
         self.api_key = os.getenv('TIINGO_KEY')
-        self.end = '2023-04-04'
         self.freq = 'daily'
-        self.start = '2023-03-31'
 
     @property
     def params(self):

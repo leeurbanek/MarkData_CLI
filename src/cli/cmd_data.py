@@ -31,7 +31,7 @@ def _add_ohlc_table(conf_obj, ctx_obj, db_con):
 
     db_con.execute(f'''
         CREATE TABLE IF NOT EXISTS {table_name} (
-            Date    TIMESTAMP   NOT NULL,
+            Date    DATE        NOT NULL,
             Symbol  TEXT        NOT NULL,
             Open    INTEGER     NOT NULL,
             High    INTEGER     NOT NULL,
