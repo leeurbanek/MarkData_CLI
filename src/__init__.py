@@ -13,6 +13,7 @@ conf_obj = ConfigParser(converters={'list': lambda x: [i.strip() for i in x.spli
 
 logger_conf = os.path.join(base_dir, 'logger.ini')
 logging.config.fileConfig(fname=logger_conf)
+logging.getLogger('unittest').setLevel(logging.WARNING)
 
 
 try:

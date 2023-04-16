@@ -1,6 +1,5 @@
 """src.data_service.__init__.py"""
 import datetime
-import logging
 import os
 
 from src import config_file, conf_obj, _value
@@ -8,9 +7,6 @@ from src.ctx_mgr import DatabaseConnectionManager
 
 
 conf_obj.read(config_file)
-
-logging.getLogger('unittest').setLevel(logging.WARNING)
-logger = logging.getLogger(__name__)
 
 
 class _BaseReader():
@@ -54,68 +50,31 @@ class _BaseReader():
         except Exception as e:
             print(f"{e} in config.ini file\nTry 'markdata config --help' for help.")
 
-#  raise NoSectionError(section) from None
-# configparser.NoSectionError: No section: 'Defaultt'
-
-# raise NoOptionError(option, section)
-# configparser.NoOptionError: No option 'endd' in section: 'Default'
-
-ctx={
-    'Default': {
-        'database': 'db.sqlite',
-        'db_table': 'None',
-        'work_dir': 'temp',
-        'start': 'None',
-        'end': 'None'
-        },
-    'Scraper': {
-        'adblock': 'None',
-        'base_url': 'https://stockcharts.com/h-sc/ui?s=',
-        'driver': 'chromedriver'
-        },
-    'Ticker': {
-        'symbol': 'EEM, IWM'
-        },
-    'debug': True,
-    'opt_trans': 'tiingo',
-    'symbol': ['EEM', 'IWM']
-    }
 
 def _sanitize_dates(start, end):
-    """"""
-    # if ctx_obj['debug']:
-    #     logger.debug(f"_sanitize_dates(ctx_obj={ctx_obj})")
+    """
+    Return (datetime start, datetime end) tuple
+    -------------------------------------------
+    Parameters
+    `start` : datetime.date,
+    `end` : datetime.date,
+    """
+    try:
+        db_path = f"{conf_obj.get('Default', 'work_dir')}/{conf_obj.get('Default', 'database')}"
+        db_table = 'ohlc' if _value(conf_obj.get('Default', 'db_table')) is None else conf_obj.get('Default', 'db_table')
+        if os.path.exists(db_path):
+            with DatabaseConnectionManager(db_path=db_path, mode='ro') as cursor:
+                cursor.execute(f"SELECT Date FROM {db_table} WHERE ROWID IN (SELECT max(ROWID) FROM {db_table});")
+                db_date = cursor.fetchone()
+    except Exception as e:
+        print(f"{e}\nTry 'markdata config --help' for help.")
 
-    # db_path = f"{ctx_obj['Default']['work_dir']}/{ctx_obj['Default']['database']}"
-    # table_name = 'ohlc'
-    # if os.path.exists(db_path):
-    #     with DatabaseConnectionManager(db_path=db_path, mode='ro') as cursor:
-    #         cursor.execute(f"SELECT Date FROM {table_name} WHERE ROWID IN (SELECT max(ROWID) FROM {table_name});")
-    #         date = cursor.fetchone()[0]
-    #         print(f"db.sqlite last date: {date}")
+    if db_date:
+        start = db_date if (db_date > start) else start
+    if start > end:
+        raise ValueError("start must be an earlier date than end")
+
     return start, end
-
-
-# fetchedData = cursor.fetchall()
-
-# # to access specific fetched data
-# for row in fetchedData:
-# 	StudentID = row[0]
-# 	StudentName = row[1]
-# 	SubmissionDate = row[2]
-# 	print(StudentName, ", ID -",
-# 		StudentID, "Submitted Assignments")
-# 	print("Date and Time : ",
-# 		SubmissionDate)
-# 	print("Submission date type is",
-# 		type(SubmissionDate))
-
-    # start, end = 'start', 'end'
-    # return start, end
-
-# =======
-
-# import datetime as dt
 
 
 # def _sanitize_dates(start, end):

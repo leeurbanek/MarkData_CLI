@@ -44,8 +44,8 @@ class DataServiceTest(unittest.TestCase):
         logging.disable(logging.NOTSET)
 
     def test_sanitize_dates(self):
-        sanitize =_sanitize_dates(self.ctx_obj)
-        # self.assertEqual(sanitize, (None, None))
+        sanitize =_sanitize_dates(start=None, end=None)
+        self.assertEqual(sanitize, (None, None))
 
 
 class TiingoReaderTest(unittest.TestCase):

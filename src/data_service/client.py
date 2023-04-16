@@ -24,9 +24,8 @@ def get_tiingo_data(ctx_obj):
 
     reader = TiingoReader()
     for symbol in ctx_obj['symbol']:
-        data_list = reader.parse_price_data(symbol)
-        print(f"start: {reader.start}, end: {reader.end}")
-        # _write_data_to_sqlite_db(ctx_obj, data_list)
+        data_list = reader.parse_price_data(symbol.strip(','))
+        _write_data_to_sqlite_db(ctx_obj, data_list)
 
 
 def _write_data_to_sqlite_db(ctx_obj, data_list):

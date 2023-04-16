@@ -27,10 +27,9 @@ def _add_ohlc_table(conf_obj, ctx_obj, db_con):
     if ctx_obj['debug']:
         logger.debug(f"_add_ohlc_table(db_con={db_con})")
 
-    table_name = 'ohlc' if _value(conf_obj, value='db_table') is None else conf_obj.get('Default', 'db_table')
-
+    db_table = 'ohlc' if _value(ctx_obj['Default']['db_table']) is None else ctx_obj['Default']['db_table']
     db_con.execute(f'''
-        CREATE TABLE IF NOT EXISTS {table_name} (
+        CREATE TABLE IF NOT EXISTS {db_table} (
             Date    DATE        NOT NULL,
             Symbol  TEXT        NOT NULL,
             Open    INTEGER     NOT NULL,
