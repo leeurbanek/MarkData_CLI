@@ -4,7 +4,7 @@ from configparser import ConfigParser
 
 import click
 
-from src import config_file, conf_obj, _none_value
+from src import config_file, conf_obj, _value
 from src.ctx_mgr import DatabaseConnectionManager
 from src.data_service import client
 
@@ -27,7 +27,7 @@ def _add_ohlc_table(conf_obj, ctx_obj, db_con):
     if ctx_obj['debug']:
         logger.debug(f"_add_ohlc_table(db_con={db_con})")
 
-    table_name = 'ohlc' if _none_value(conf_obj, value='db_table') else table_name
+    table_name = 'ohlc' if _value(conf_obj, value='db_table') is None else conf_obj.get('Default', 'db_table')
 
     db_con.execute(f'''
         CREATE TABLE IF NOT EXISTS {table_name} (

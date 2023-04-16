@@ -3,7 +3,7 @@ import datetime
 import logging
 import os
 
-from src import config_file, conf_obj, _none_value
+from src import config_file, conf_obj, _value
 from src.ctx_mgr import DatabaseConnectionManager
 
 
@@ -19,11 +19,9 @@ class _BaseReader():
         self.api_key = api_key
         self.freq = freq
         self.symbol = symbol
-
-        # start, end = _sanitize_dates(start or self.default_start_date, end)
-        start, end = _sanitize_dates()
-        self.start = self.default_start_date()
-        self.end = datetime.date.today()
+        start, end = _sanitize_dates(self.default_start_date, self.default_end_date)
+        self.start = start
+        self.end = end
 
     @property
     def params(self):
@@ -36,24 +34,31 @@ class _BaseReader():
         # must be overridden in subclass
         raise NotImplementedError
 
-    # @property
+    @property
     def default_start_date(self):
         """Default start date for reader"""
-        default = datetime.date.today() - datetime.timedelta(days=90)
-        # return default
-        print(f"_none_value: {_none_value(conf_obj, value='start')}, type: {type(_none_value(conf_obj, value='start'))}")
-        value = default if _none_value(conf_obj, value='start') is None else conf_obj.get('Default', 'start')
-        return value
-
-# table_name = 'ohlc' if _none_value(conf_obj, value='db_table') else table_name
+        try:
+            config_date = conf_obj.get('Default', 'start')
+            default_date = datetime.date.today() - datetime.timedelta(days=90)
+            return default_date if _value(config_date) is None else config_date
+        except Exception as e:
+            print(f"{e} in config.ini file\nTry 'markdata config --help' for help.")
 
     @property
     def default_end_date(self):
         """Default end date for reader"""
-        if not _none_value(conf_obj, 'Default', 'end'):
-            return conf_obj.get('Default', 'end')
-        else:
-            return datetime.date.today()
+        try:
+            config_date = conf_obj.get('Default', 'end')
+            default_date = datetime.date.today()
+            return default_date if _value(config_date) is None else config_date
+        except Exception as e:
+            print(f"{e} in config.ini file\nTry 'markdata config --help' for help.")
+
+#  raise NoSectionError(section) from None
+# configparser.NoSectionError: No section: 'Defaultt'
+
+# raise NoOptionError(option, section)
+# configparser.NoOptionError: No option 'endd' in section: 'Default'
 
 ctx={
     'Default': {
@@ -76,18 +81,19 @@ ctx={
     'symbol': ['EEM', 'IWM']
     }
 
-def _sanitize_dates(ctx_obj=ctx, start=None, end=None):
+def _sanitize_dates(start, end):
     """"""
-    if ctx_obj['debug']:
-        logger.debug(f"_sanitize_dates(ctx_obj={ctx_obj})")
+    # if ctx_obj['debug']:
+    #     logger.debug(f"_sanitize_dates(ctx_obj={ctx_obj})")
 
-    db_path = f"{ctx_obj['Default']['work_dir']}/{ctx_obj['Default']['database']}"
-    table_name = 'ohlc'
-    if os.path.exists(db_path):
-        with DatabaseConnectionManager(db_path=db_path, mode='ro') as cursor:
-            cursor.execute(f"SELECT Date FROM {table_name} WHERE ROWID IN (SELECT max(ROWID) FROM {table_name});")
-            date = cursor.fetchone()[0]
-            print(f"db.sqlite last date: {date}")
+    # db_path = f"{ctx_obj['Default']['work_dir']}/{ctx_obj['Default']['database']}"
+    # table_name = 'ohlc'
+    # if os.path.exists(db_path):
+    #     with DatabaseConnectionManager(db_path=db_path, mode='ro') as cursor:
+    #         cursor.execute(f"SELECT Date FROM {table_name} WHERE ROWID IN (SELECT max(ROWID) FROM {table_name});")
+    #         date = cursor.fetchone()[0]
+    #         print(f"db.sqlite last date: {date}")
+    return start, end
 
 
 # fetchedData = cursor.fetchall()
@@ -104,8 +110,8 @@ def _sanitize_dates(ctx_obj=ctx, start=None, end=None):
 # 	print("Submission date type is",
 # 		type(SubmissionDate))
 
-    start, end = 'start', 'end'
-    return start, end
+    # start, end = 'start', 'end'
+    # return start, end
 
 # =======
 
