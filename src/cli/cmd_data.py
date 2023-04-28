@@ -21,17 +21,16 @@ def _add_database_table(db_con, table_name):
     `db_con` : sqlite3.Connection object
         Connection to the time series database.\n
     """
-#     db_con.execute(f'''
-#         CREATE TABLE IF NOT EXISTS {table_name} (
-#             Date     DATE     NOT NULL,
-#             Open     INTEGER  NOT NULL,
-#             High     INTEGER  NOT NULL,
-#             Low      INTEGER  NOT NULL,
-#             Close    INTEGER  NOT NULL,
-#             AdjCl    INTEGER  NOT NULL,
-#             Volume   INTEGER  NOT NULL,
-#             PRIMARY  KEY (Date));
-#         ''')
+    db_con.execute(f'''
+        CREATE TABLE IF NOT EXISTS {table_name} (
+            DateDATENOT NULL,
+            High     INTEGER  NOT NULL,
+            Low      INTEGER  NOT NULL,
+            Close    INTEGER  NOT NULL,
+            AdjCl    INTEGER  NOT NULL,
+            Volume   INTEGER  NOT NULL,
+            PRIMARYKEY(Date));
+        ''')
 
 
 def _add_ohlc_table(conf_obj, ctx_obj, db_con):
