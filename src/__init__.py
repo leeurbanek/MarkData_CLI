@@ -1,6 +1,8 @@
+"""src.__init__.py"""
 import logging.config
 import os
 from configparser import ConfigParser
+
 from dotenv import load_dotenv
 
 
@@ -29,20 +31,13 @@ __all__ = [
 ]
 
 
-# def _value(conf_obj, key='Default', value=None):
-def _value(v):
-    """Convert string 'None' to None type
+def _value(string):
+    """Convert str 'None' or '' to None type
     ----------------------------------
-    Parse 'None' strings in config.ini to Python None type.\n
+    Parse 'None' or '' string in config.ini to Python None type.\n
     Parameters
     ----------
-    `ctx_obj` : dictionary
-        Python Click context object.\n
-    `key` : string
-        config.ini section name.\n
-    `value` : string
+    `string` : str
         Config parameter name.\n
     """
-    # v = conf_obj.get(key, value)
-    # return None if v == ('None' or '') else v
-    return None if v == ('None' or '') else v
+    return None if string in ['None', ''] else string

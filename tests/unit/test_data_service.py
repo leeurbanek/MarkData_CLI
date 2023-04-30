@@ -3,8 +3,8 @@ import logging
 import unittest
 from unittest.mock import Mock
 
-from src.data_service import _sanitize_dates
-from src.data_service.client import _write_data_to_sqlite_db
+from src.data_service import _BaseReader
+# from src.data_service.client import _write_data_to_sqlite_db
 from src.data_service.reader import TiingoReader
 
 
@@ -17,7 +17,7 @@ class ClientTest(unittest.TestCase):
         pass
 
 
-class DataServiceTest(unittest.TestCase):
+class _BaseReaderTest(unittest.TestCase):
 
     def setUp(self) -> None:
         logging.disable(logging.CRITICAL)
@@ -39,13 +39,28 @@ class DataServiceTest(unittest.TestCase):
             },
             'debug': True, 'opt_trans': 'alpha', 'symbol': ['EEM', 'IWM']
         }
+        self.reader = _BaseReader()
+        self._value = Mock()
 
     def tearDown(self) -> None:
         logging.disable(logging.NOTSET)
+        del self.ctx_obj, self.reader, self._value
 
-    def test_sanitize_dates(self):
-        sanitize =_sanitize_dates(start=None, end=None)
-        self.assertEqual(sanitize, (None, None))
+    def test_IsInstance_BaseReader(self):
+        self.assertIsInstance(self.reader, _BaseReader)
+
+    def test_default_start_date_if_no_config_date(self):
+        self._value.return_value = None
+        # default = self.reader.default_start_date
+        # start = datetime.date.today() - datetime.timedelta(days=30)
+        self.assertEqual(self.reader.default_start_date, None)
+
+    def test_default_end_date(self):
+        pass
+
+    # def test_sanitize_dates(self):
+    #     sanitize =_sanitize_dates(start=None, end=None)
+    #     self.assertEqual(sanitize, (None, None))
 
 
 class TiingoReaderTest(unittest.TestCase):
@@ -71,6 +86,7 @@ class TiingoReaderTest(unittest.TestCase):
         ]
 
     def tearDown(self) -> None:
+        logging.disable(logging.CRITICAL)
         del self._read_one_price_data
 
     def test_parse_price_data(self):

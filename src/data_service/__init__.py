@@ -33,10 +33,12 @@ class _BaseReader():
     @property
     def default_start_date(self):
         """Default start date for reader"""
+        pass
         try:
-            config_date = conf_obj.get('Default', 'start')
-            default_date = datetime.date.today() - datetime.timedelta(days=90)
-            return default_date if _value(config_date) is None else config_date
+            # config_date = conf_obj.get('Default', 'start')
+            # default_date = datetime.date.today() - datetime.timedelta(days=30)
+            # return default_date if _value(config_date) is None else config_date
+            return _value(conf_obj.get('Default', 'start'))
         except Exception as e:
             print(f"{e} in config.ini file\nTry 'markdata config --help' for help.")
 
@@ -51,6 +53,34 @@ class _BaseReader():
             print(f"{e} in config.ini file\nTry 'markdata config --help' for help.")
 
 
+def get_database_max_date():
+    """Get the date of the first/last record in the table.
+    ---------------------------------------------------
+    If table has no records return None.\n
+    `db_connection()` is needed for database connection.\n
+    Parameters
+    ----------
+    `db_con` : sqlite3.Connection object
+        Connection to the time series database.\n
+    `table_name` : string
+        Name of the table to check.\n
+    `extreme` : string
+        MIN/MAX (first/last) date to return.\n
+    Returns
+    -------
+    'YYYY-MM-DD' string or None.\n
+    """
+    try:
+        db_path = f"{conf_obj.get('Default', 'work_dir')}/{conf_obj.get('Default', 'database')}"
+        db_table = 'ohlc' if _value(conf_obj.get('Default', 'db_table')) is None else conf_obj.get('Default', 'db_table')
+        if os.path.isfile(db_path):
+            with DatabaseConnectionManager(db_path=db_path, mode='ro') as cursor:
+                cursor.execute(f"SELECT Date FROM {db_table} WHERE ROWID IN (SELECT max(ROWID) FROM {db_table});")
+                db_date = cursor.fetchone()
+    except Exception as e:
+        print(f"{e}\nTry 'markdata config --help' for help.")
+
+
 def _sanitize_dates(start, end):
     """
     Return (datetime start, datetime end) tuple
@@ -62,17 +92,17 @@ def _sanitize_dates(start, end):
     try:
         db_path = f"{conf_obj.get('Default', 'work_dir')}/{conf_obj.get('Default', 'database')}"
         db_table = 'ohlc' if _value(conf_obj.get('Default', 'db_table')) is None else conf_obj.get('Default', 'db_table')
-        if os.path.exists(db_path):
+        if os.path.isfile(db_path):
             with DatabaseConnectionManager(db_path=db_path, mode='ro') as cursor:
                 cursor.execute(f"SELECT Date FROM {db_table} WHERE ROWID IN (SELECT max(ROWID) FROM {db_table});")
                 db_date = cursor.fetchone()
     except Exception as e:
         print(f"{e}\nTry 'markdata config --help' for help.")
 
-    if db_date:
-        start = db_date if (db_date > start) else start
-    if start > end:
-        raise ValueError("start must be an earlier date than end")
+    # if db_date:
+    #     start = db_date if (db_date > start) else start
+    # if start > end:
+    #     raise ValueError("start must be an earlier date than end")
 
     return start, end
 

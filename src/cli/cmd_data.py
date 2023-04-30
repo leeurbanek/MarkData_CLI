@@ -96,8 +96,9 @@ def cli(ctx, opt_trans, symbol):
             click.echo("Error: The database name is not set\nTry 'markdata config --help' for help.")
             return
         # create database and add talbe if not exist
-        if not os.path.exists(f"{ctx.obj['Default']['work_dir']}/{ctx.obj['Default']['database']}"):
-            with DatabaseConnectionManager(db_path=f"{ctx.obj['Default']['work_dir']}/{ctx.obj['Default']['database']}", mode='rwc') as db_con:
+        db_path = f"{ctx.obj['Default']['work_dir']}/{ctx.obj['Default']['database']}"
+        if not os.path.isfile(db_path):
+            with DatabaseConnectionManager(db_path=db_path, mode='rwc') as db_con:
                 _add_ohlc_table(conf_obj=ctx.obj, ctx_obj=ctx.obj, db_con=db_con)
 
         if symbol:  # use symbols from command line input
