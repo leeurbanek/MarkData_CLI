@@ -1,7 +1,7 @@
 import datetime
 import logging
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 from src.data_service import _BaseReader
 # from src.data_service.client import _write_data_to_sqlite_db
@@ -49,11 +49,22 @@ class _BaseReaderTest(unittest.TestCase):
     def test_IsInstance_BaseReader(self):
         self.assertIsInstance(self.reader, _BaseReader)
 
-    def test_default_start_date_if_no_config_date(self):
-        self._value.return_value = None
+    # def test_default_start_date_if_no_config_date(self):
+    #     self._value.return_value = None
         # default = self.reader.default_start_date
         # start = datetime.date.today() - datetime.timedelta(days=30)
-        self.assertEqual(self.reader.default_start_date, None)
+        # self.assertEqual(self.reader.default_start_date, None)
+
+    @patch('src.data_service.conf_obj.get')
+    def test_default_start_date_if_config_date_set(self, conf_obj):
+        config_date = conf_obj.return_value=  '2000-1-1'
+        self.assertEqual(self.reader.default_start_date, datetime.datetime.strptime('2000-1-1','%Y-%m-%d').date())
+
+    @patch('src.data_service.conf_obj.get')
+    def test_default_start_date_if_no_config_date(self, conf_obj):
+        config_date = conf_obj.return_value=  ''
+        today = datetime.date.today()
+        self.assertEqual(self.reader.default_start_date, today - datetime.timedelta(days=30))
 
     def test_default_end_date(self):
         pass

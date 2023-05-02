@@ -33,14 +33,30 @@ class _BaseReader():
     @property
     def default_start_date(self):
         """Default start date for reader"""
-        pass
-        try:
-            # config_date = conf_obj.get('Default', 'start')
-            # default_date = datetime.date.today() - datetime.timedelta(days=30)
-            # return default_date if _value(config_date) is None else config_date
-            return _value(conf_obj.get('Default', 'start'))
-        except Exception as e:
-            print(f"{e} in config.ini file\nTry 'markdata config --help' for help.")
+        date_list = []
+        date_list.append(datetime.date.today() - datetime.timedelta(days=30))
+        config_date = _value(conf_obj.get('Default', 'start'))
+        if config_date:
+            date_list.append(datetime.datetime.strptime(config_date, '%Y-%m-%d').date())
+        if _get_database_max_date():
+            date_list.append(_get_database_max_date())
+        return min(date_list)
+
+
+        # try:
+        #     # datetime.strptime('2011-03-07', '%Y-%m-%d')
+        #     dates.append(datetime.date.strftime(conf_obj.get('Default', 'start'), '%Y-%m-%d'))
+        #     # dates.append(datetime.date.today() - datetime.timedelta(days=30))
+        #     # dates.append(_get_database_max_date() + datetime.timedelta(days=1))
+        # except Exception as e:
+        #     print(f"{e} in config.ini file\nTry 'markdata config --help' for help.")
+        # return dates
+
+    """
+    if database date:
+        use most recent date
+    if config date:
+    """
 
     @property
     def default_end_date(self):
@@ -53,7 +69,7 @@ class _BaseReader():
             print(f"{e} in config.ini file\nTry 'markdata config --help' for help.")
 
 
-def get_database_max_date():
+def _get_database_max_date():
     """Get the date of the first/last record in the table.
     ---------------------------------------------------
     If table has no records return None.\n
@@ -76,7 +92,7 @@ def get_database_max_date():
         if os.path.isfile(db_path):
             with DatabaseConnectionManager(db_path=db_path, mode='ro') as cursor:
                 cursor.execute(f"SELECT Date FROM {db_table} WHERE ROWID IN (SELECT max(ROWID) FROM {db_table});")
-                db_date = cursor.fetchone()
+                return cursor.fetchone()
     except Exception as e:
         print(f"{e}\nTry 'markdata config --help' for help.")
 
