@@ -34,20 +34,24 @@ class _BaseReader():
     def default_start_date(self):
         """Default start date for reader"""
         date_list = []
-        date_list.append(datetime.date.today() - datetime.timedelta(days=30))
         config_date = _value(conf_obj.get('Default', 'start'))
+        print(f"\n******* config_date: {config_date}, type: {type(config_date)}")
         if config_date:
             date_list.append(datetime.datetime.strptime(config_date, '%Y-%m-%d').date())
-        if _get_database_max_date():
-            date_list.append(_get_database_max_date())
-        return min(date_list)
+        print(f"\n******* _database_max_date(): {_database_max_date()}, type: {type(_database_max_date())}")
+        if _database_max_date():
+            date_list.append(_database_max_date())
+        if date_list:
+            return max(date_list)
+        else:
+            return None
 
 
         # try:
         #     # datetime.strptime('2011-03-07', '%Y-%m-%d')
         #     dates.append(datetime.date.strftime(conf_obj.get('Default', 'start'), '%Y-%m-%d'))
         #     # dates.append(datetime.date.today() - datetime.timedelta(days=30))
-        #     # dates.append(_get_database_max_date() + datetime.timedelta(days=1))
+        #     # dates.append(_database_max_date() + datetime.timedelta(days=1))
         # except Exception as e:
         #     print(f"{e} in config.ini file\nTry 'markdata config --help' for help.")
         # return dates
@@ -69,7 +73,7 @@ class _BaseReader():
             print(f"{e} in config.ini file\nTry 'markdata config --help' for help.")
 
 
-def _get_database_max_date():
+def _database_max_date():
     """Get the date of the first/last record in the table.
     ---------------------------------------------------
     If table has no records return None.\n
