@@ -1,5 +1,6 @@
 """src.data_service.__init__.py"""
 import datetime
+import logging
 import os
 
 from src import config_file, conf_obj, _value
@@ -35,17 +36,14 @@ class _BaseReader():
         """Default start date for reader"""
         date_list = []
         config_date = _value(conf_obj.get('Default', 'start'))
-        print(f"\n******* config_date: {config_date}, type: {type(config_date)}")
         if config_date:
             date_list.append(datetime.datetime.strptime(config_date, '%Y-%m-%d').date())
-        print(f"\n******* _database_max_date(): {_database_max_date()}, type: {type(_database_max_date())}")
         if _database_max_date():
             date_list.append(_database_max_date())
         if date_list:
             return max(date_list)
         else:
             return None
-
 
         # try:
         #     # datetime.strptime('2011-03-07', '%Y-%m-%d')
@@ -127,6 +125,49 @@ def _sanitize_dates(start, end):
     return start, end
 
 
+if __name__ == '__main__':
+    import unittest
+
+    class _BaseReaderTest(unittest.TestCase):
+
+        def setUp(self) -> None:
+            logging.disable(logging.CRITICAL)
+            self.reader = _BaseReader()
+
+        def tearDown(self) -> None:
+            logging.disable(logging.NOTSET)
+            del self.reader
+
+        def test_IsInstance_BaseReader(self):
+            self.assertIsInstance(self.reader, _BaseReader)
+
+    class _database_max_date_Test(unittest.TestCase):
+        pass
+
+    class default_end_date_Test(unittest.TestCase):
+        pass
+
+            # @patch('src.data_service._value')
+    # @patch('src.data_service._database_max_date')
+        # def test_start_date_if_db_date_no_config_date(self):
+        #     # _value.return_value = None
+        #     _database_max_date = Mock()
+        #     _database_max_date.return_value = datetime.date.today()
+        #     print(f"\n+++++++ _database_max_date() = {_database_max_date()}, type: {type(_database_max_date())}")
+        #     self.assertEqual(self.reader.default_start_date, datetime.date.today())
+        #     del _database_max_date
+
+    #     def test_value_with_None_string_returns_None(self):
+    #         assert _value('None') == None
+
+    #     def test_value_with_empty_string_returns_None(self):
+    #         assert _value('') == None
+
+    #     def test_value_with_string_returns_string(self):
+    #         assert _value('2000-1-1') == '2000-1-1'
+
+    unittest.main()
+
 # def _sanitize_dates(start, end):
 #     """
 #     Return (timestamp_start, timestamp_end) tuple
@@ -164,3 +205,24 @@ def _sanitize_dates(start, end):
 #     if start > end:
 #         raise ValueError("start must be an earlier date than end")
 #     return start, end
+
+# =======
+
+# self.ctx_obj = {
+#     'Default': {
+#         'database': 'db.sqlite',
+#         'db_table': 'None',
+#         'work_dir': 'temp',
+#         'start': 'None',
+#         'end': 'None'
+#     },
+#     'Scraper': {
+#         'adblock': 'None',
+#         'base_url': 'https://stockcharts.com/h-sc/ui?s=',
+#         'driver': 'chromedriver'
+#     },
+#     'Ticker': {
+#         'symbol': 'EEM, IWM'
+#     },
+#     'debug': True, 'opt_trans': 'alpha', 'symbol': ['EEM', 'IWM']
+# }
