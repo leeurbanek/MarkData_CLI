@@ -2,6 +2,7 @@
 import datetime
 import logging
 import os
+import sqlite3
 
 from src import config_file, conf_obj, _value
 from src.ctx_mgr import DatabaseConnectionManager
@@ -16,7 +17,7 @@ class _BaseReader():
         self.api_key = api_key
         self.freq = freq
         self.symbol = symbol
-        start, end = _sanitize_dates(self.default_start_date, self.default_end_date)
+        # start, end = _sanitize_dates(self.default_start_date, self.default_end_date)
         self.start = start
         self.end = end
 
@@ -30,6 +31,16 @@ class _BaseReader():
         """API URL"""
         # must be overridden in subclass
         raise NotImplementedError
+
+    @property
+    def default_end_date(self):
+        """Default end date for reader"""
+        try:
+            config_date = conf_obj.get('Default', 'end')
+            default_date = datetime.date.today()
+            return default_date if _value(config_date) is None else config_date
+        except Exception as e:
+            print(f"{e} in config.ini file\nTry 'markdata config --help' for help.")
 
     @property
     def default_start_date(self):
@@ -54,49 +65,31 @@ class _BaseReader():
         #     print(f"{e} in config.ini file\nTry 'markdata config --help' for help.")
         # return dates
 
-    """
-    if database date:
-        use most recent date
-    if config date:
-    """
 
-    @property
-    def default_end_date(self):
-        """Default end date for reader"""
-        try:
-            config_date = conf_obj.get('Default', 'end')
-            default_date = datetime.date.today()
-            return default_date if _value(config_date) is None else config_date
-        except Exception as e:
-            print(f"{e} in config.ini file\nTry 'markdata config --help' for help.")
-
-
-def _database_max_date():
-    """Get the date of the first/last record in the table.
-    ---------------------------------------------------
+def _database_max_date(db_con, db_table):
+    """Get the date of the last record in the table.
+    ---------------------------------------------
     If table has no records return None.\n
-    `db_connection()` is needed for database connection.\n
     Parameters
     ----------
     `db_con` : sqlite3.Connection object
         Connection to the time series database.\n
     `table_name` : string
         Name of the table to check.\n
-    `extreme` : string
-        MIN/MAX (first/last) date to return.\n
     Returns
     -------
-    'YYYY-MM-DD' string or None.\n
+    datetime.date object or None.\n
     """
+    cursor = db_con.cursor()
     try:
-        db_path = f"{conf_obj.get('Default', 'work_dir')}/{conf_obj.get('Default', 'database')}"
-        db_table = 'ohlc' if _value(conf_obj.get('Default', 'db_table')) is None else conf_obj.get('Default', 'db_table')
-        if os.path.isfile(db_path):
-            with DatabaseConnectionManager(db_path=db_path, mode='ro') as cursor:
-                cursor.execute(f"SELECT Date FROM {db_table} WHERE ROWID IN (SELECT max(ROWID) FROM {db_table});")
-                return cursor.fetchone()
+        cursor.execute(f"SELECT Date FROM {db_table} WHERE ROWID IN (SELECT max(ROWID) FROM {db_table});")
     except Exception as e:
         print(f"{e}\nTry 'markdata config --help' for help.")
+    result = cursor.fetchone()
+    if result:
+        return result[0]
+    else:
+        return None
 
 
 def _sanitize_dates(start, end):
@@ -116,17 +109,21 @@ def _sanitize_dates(start, end):
                 db_date = cursor.fetchone()
     except Exception as e:
         print(f"{e}\nTry 'markdata config --help' for help.")
-
     # if db_date:
     #     start = db_date if (db_date > start) else start
     # if start > end:
     #     raise ValueError("start must be an earlier date than end")
-
     return start, end
 
 
 if __name__ == '__main__':
     import unittest
+
+    class DefaultStartDateTest(unittest.TestCase):
+        def setUp(self) -> None:
+            return super().setUp()
+
+
 
     class _BaseReaderTest(unittest.TestCase):
 
@@ -141,11 +138,45 @@ if __name__ == '__main__':
         def test_IsInstance_BaseReader(self):
             self.assertIsInstance(self.reader, _BaseReader)
 
-    class _database_max_date_Test(unittest.TestCase):
-        pass
 
-    class default_end_date_Test(unittest.TestCase):
-        pass
+    class _database_max_date_Test(unittest.TestCase):
+
+        def setUp(self) -> None:
+            self.db_table = 'data'
+
+        def test_database_max_date_with_data_in_table(self):
+            db = sqlite3.connect("file::memory:?cache=shared", detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES, uri=True)
+            rows = [
+                (datetime.date.today() - datetime.timedelta(days=1), 1),
+                (datetime.date.today(), 2),
+            ]
+            with db as db_con:
+                cursor = db_con.cursor()
+                cursor.execute(f'''
+                    CREATE TABLE {self.db_table} (
+                        Date    DATE        NOT NULL,
+                        Row     INTEGER     NOT NULL,
+                        PRIMARY KEY (Date)
+                    );
+                ''')
+                cursor.executemany('INSERT INTO data VALUES (?,?)', rows)
+                db_date = _database_max_date(db_con, self.db_table)
+                self.assertEqual(db_date, datetime.date.today())
+
+        def test_database_max_date_with_no_data_in_table(self):
+            db = sqlite3.connect("file::memory:?cache=shared", detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES, uri=True)
+            with db as db_con:
+                cursor = db_con.cursor()
+                cursor.execute(f'''
+                    CREATE TABLE {self.db_table} (
+                        Date    DATE        NOT NULL,
+                        Row     INTEGER     NOT NULL,
+                        PRIMARY KEY (Date)
+                    );
+                ''')
+                db_date = _database_max_date(db_con, self.db_table)
+                self.assertEqual(db_date, None)
+
 
             # @patch('src.data_service._value')
     # @patch('src.data_service._database_max_date')
