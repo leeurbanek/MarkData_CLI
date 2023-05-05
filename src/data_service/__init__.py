@@ -49,8 +49,8 @@ class _BaseReader():
         config_date = _value(conf_obj.get('Default', 'start'))
         if config_date:
             date_list.append(datetime.datetime.strptime(config_date, '%Y-%m-%d').date())
-        if _database_max_date():
-            date_list.append(_database_max_date())
+        # if _database_max_date():
+        #     date_list.append(_database_max_date())
         if date_list:
             return max(date_list)
         else:
@@ -118,11 +118,23 @@ def _sanitize_dates(start, end):
 
 if __name__ == '__main__':
     import unittest
+    from unittest.mock import Mock, patch
 
     class DefaultStartDateTest(unittest.TestCase):
         def setUp(self) -> None:
-            return super().setUp()
+            self.reader = _BaseReader()
+            # self._value = Mock()
+            # self._value.return_value = '2000-1-1'
 
+        def tearDown(self) -> None:
+            del self.reader
+            # del self._value
+
+        @patch('src.data_service._value')
+        def test_start_date_with_no_config_or_database_set(self, _value):
+            _value.return_value = '2000-1-1'
+            result = self.reader.default_start_date
+            self.assertEqual(result, datetime.date.today())
 
 
     class _BaseReaderTest(unittest.TestCase):
@@ -177,6 +189,7 @@ if __name__ == '__main__':
                 db_date = _database_max_date(db_con, self.db_table)
                 self.assertEqual(db_date, None)
 
+    unittest.main()
 
             # @patch('src.data_service._value')
     # @patch('src.data_service._database_max_date')
@@ -197,7 +210,7 @@ if __name__ == '__main__':
     #     def test_value_with_string_returns_string(self):
     #         assert _value('2000-1-1') == '2000-1-1'
 
-    unittest.main()
+# =======
 
 # def _sanitize_dates(start, end):
 #     """
