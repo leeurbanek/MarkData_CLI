@@ -49,8 +49,9 @@ class _BaseReader():
         config_date = _value(conf_obj.get('Default', 'start'))
         if config_date:
             date_list.append(datetime.datetime.strptime(config_date, '%Y-%m-%d').date())
-        # if _database_max_date():
-        #     date_list.append(_database_max_date())
+        db_path = f"{conf_obj.get('Default', 'work_dir')}/{conf_obj.get('Default', 'database')}"
+        if os.path.isfile(db_path):
+            date_list.append(_database_max_date())
         if date_list:
             return max(date_list)
         else:
@@ -130,9 +131,12 @@ if __name__ == '__main__':
             del self.reader
             # del self._value
 
-        @patch('src.data_service._value')
-        def test_start_date_with_no_config_or_database_set(self, _value):
-            _value.return_value = '2000-1-1'
+        @patch('__main__._value')
+        # @patch('__main__._database_max_date')
+        # def test_start_date_with_no_config_or_database_set(self, mock_value, mock_db_date):
+        def test_start_date_with_no_config_or_database_set(self, mock_value):
+            mock_value.return_value = '1999-12-31'
+            # mock_db_date.return_value = datetime.datetime.strptime('2000-1-1', '%Y-%m-%d')
             result = self.reader.default_start_date
             self.assertEqual(result, datetime.date.today())
 
