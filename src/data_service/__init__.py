@@ -1,8 +1,7 @@
 """src.data_service.__init__.py"""
+import configparser
 import datetime
-import logging
 import os
-import sqlite3
 
 from src import config_file, conf_obj, _value
 from src.ctx_mgr import DatabaseConnectionManager
@@ -35,36 +34,32 @@ class _BaseReader():
     @property
     def default_end_date(self):
         """Default end date for reader"""
-        try:
-            config_date = conf_obj.get('Default', 'end')
+        end_date = _value(conf_obj.get('Default', 'start'))
+        if end_date:
+            try:
+                default_date = datetime.datetime.strptime(end_date, '%Y-%m-%d').date()
+            except TypeError as e:
+                print(f"ERROR: {e}\nin src/data_service/__init__.py default_end_date()")
+        else:
             default_date = datetime.date.today()
-            return default_date if _value(config_date) is None else config_date
-        except Exception as e:
-            print(f"{e} in config.ini file\nTry 'markdata config --help' for help.")
+        return default_date
 
     @property
     def default_start_date(self):
         """Default start date for reader"""
-        date_list = []
-        config_date = _value(conf_obj.get('Default', 'start'))
-        if config_date:
-            date_list.append(datetime.datetime.strptime(config_date, '%Y-%m-%d').date())
-        db_path = f"{conf_obj.get('Default', 'work_dir')}/{conf_obj.get('Default', 'database')}"
-        if os.path.isfile(db_path):
-            date_list.append(_database_max_date())
-        if date_list:
-            return max(date_list)
+        start_date = _value(conf_obj.get('Default', 'start'))
+        if start_date:
+            try:
+                default_date = datetime.datetime.strptime(start_date, '%Y-%m-%d').date()
+            except TypeError as e:
+                print(f"ERROR: {e}\nin src/data_service/__init__.py default_start_date()")
         else:
-            return None
-
-        # try:
-        #     # datetime.strptime('2011-03-07', '%Y-%m-%d')
-        #     dates.append(datetime.date.strftime(conf_obj.get('Default', 'start'), '%Y-%m-%d'))
-        #     # dates.append(datetime.date.today() - datetime.timedelta(days=30))
-        #     # dates.append(_database_max_date() + datetime.timedelta(days=1))
-        # except Exception as e:
-        #     print(f"{e} in config.ini file\nTry 'markdata config --help' for help.")
-        # return dates
+            try:
+                days = int(conf_obj.get('Default', 'td_days'))
+                default_date = datetime.date.today() - datetime.timedelta(days=days)
+            except configparser.NoOptionError as e:
+                print(f"{e} in config.ini file\nTry 'markdata config --help' for help.")
+        return default_date
 
 
 def _database_max_date(db_con, db_table):
@@ -115,104 +110,6 @@ def _sanitize_dates(start, end):
     # if start > end:
     #     raise ValueError("start must be an earlier date than end")
     return start, end
-
-
-if __name__ == '__main__':
-    import unittest
-    from unittest.mock import Mock, patch
-
-    class DefaultStartDateTest(unittest.TestCase):
-        def setUp(self) -> None:
-            self.reader = _BaseReader()
-            # self._value = Mock()
-            # self._value.return_value = '2000-1-1'
-
-        def tearDown(self) -> None:
-            del self.reader
-            # del self._value
-
-        @patch('__main__._value')
-        # @patch('__main__._database_max_date')
-        # def test_start_date_with_no_config_or_database_set(self, mock_value, mock_db_date):
-        def test_start_date_with_no_config_or_database_set(self, mock_value):
-            mock_value.return_value = '1999-12-31'
-            # mock_db_date.return_value = datetime.datetime.strptime('2000-1-1', '%Y-%m-%d')
-            result = self.reader.default_start_date
-            self.assertEqual(result, datetime.date.today())
-
-
-    class _BaseReaderTest(unittest.TestCase):
-
-        def setUp(self) -> None:
-            logging.disable(logging.CRITICAL)
-            self.reader = _BaseReader()
-
-        def tearDown(self) -> None:
-            logging.disable(logging.NOTSET)
-            del self.reader
-
-        def test_IsInstance_BaseReader(self):
-            self.assertIsInstance(self.reader, _BaseReader)
-
-
-    class _database_max_date_Test(unittest.TestCase):
-
-        def setUp(self) -> None:
-            self.db_table = 'data'
-
-        def test_database_max_date_with_data_in_table(self):
-            db = sqlite3.connect("file::memory:?cache=shared", detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES, uri=True)
-            rows = [
-                (datetime.date.today() - datetime.timedelta(days=1), 1),
-                (datetime.date.today(), 2),
-            ]
-            with db as db_con:
-                cursor = db_con.cursor()
-                cursor.execute(f'''
-                    CREATE TABLE {self.db_table} (
-                        Date    DATE        NOT NULL,
-                        Row     INTEGER     NOT NULL,
-                        PRIMARY KEY (Date)
-                    );
-                ''')
-                cursor.executemany('INSERT INTO data VALUES (?,?)', rows)
-                db_date = _database_max_date(db_con, self.db_table)
-                self.assertEqual(db_date, datetime.date.today())
-
-        def test_database_max_date_with_no_data_in_table(self):
-            db = sqlite3.connect("file::memory:?cache=shared", detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES, uri=True)
-            with db as db_con:
-                cursor = db_con.cursor()
-                cursor.execute(f'''
-                    CREATE TABLE {self.db_table} (
-                        Date    DATE        NOT NULL,
-                        Row     INTEGER     NOT NULL,
-                        PRIMARY KEY (Date)
-                    );
-                ''')
-                db_date = _database_max_date(db_con, self.db_table)
-                self.assertEqual(db_date, None)
-
-    unittest.main()
-
-            # @patch('src.data_service._value')
-    # @patch('src.data_service._database_max_date')
-        # def test_start_date_if_db_date_no_config_date(self):
-        #     # _value.return_value = None
-        #     _database_max_date = Mock()
-        #     _database_max_date.return_value = datetime.date.today()
-        #     print(f"\n+++++++ _database_max_date() = {_database_max_date()}, type: {type(_database_max_date())}")
-        #     self.assertEqual(self.reader.default_start_date, datetime.date.today())
-        #     del _database_max_date
-
-    #     def test_value_with_None_string_returns_None(self):
-    #         assert _value('None') == None
-
-    #     def test_value_with_empty_string_returns_None(self):
-    #         assert _value('') == None
-
-    #     def test_value_with_string_returns_string(self):
-    #         assert _value('2000-1-1') == '2000-1-1'
 
 # =======
 

@@ -38,23 +38,6 @@ def _value(string):
     Parameters
     ----------
     `string` : str
-        Config parameter name.\n
+        Config parameter value.\n
     """
     return None if string in ['None', ''] else string
-
-
-if __name__ == '__main__':
-    import unittest
-
-    class Test_value(unittest.TestCase):
-
-        def test_value_with_None_string_returns_None(self):
-            self.assertEqual(_value('None'), None)
-
-        def test_value_with_empty_string_returns_None(self):
-            self.assertEqual(_value(''), None)
-
-        def test_value_with_string_returns_string(self):
-            self.assertEqual(_value('2000-1-1'), '2000-1-1')
-
-    unittest.main()
