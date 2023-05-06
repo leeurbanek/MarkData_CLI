@@ -1,5 +1,4 @@
 """src.data_service.__init__.py"""
-import configparser
 import datetime
 import os
 
@@ -16,7 +15,7 @@ class _BaseReader():
         self.api_key = api_key
         self.freq = freq
         self.symbol = symbol
-        # start, end = _sanitize_dates(self.default_start_date, self.default_end_date)
+        start, end = _sanitize_dates(self.default_start_date, self.default_end_date)
         self.start = start
         self.end = end
 
@@ -33,7 +32,12 @@ class _BaseReader():
 
     @property
     def default_end_date(self):
-        """Default end date for reader"""
+        """Default end date for reader
+        ---------------------------
+        Returns
+        -------
+        datetime.date object
+        """
         end_date = _value(conf_obj.get('Default', 'start'))
         if end_date:
             try:
@@ -46,7 +50,12 @@ class _BaseReader():
 
     @property
     def default_start_date(self):
-        """Default start date for reader"""
+        """Default start date for reader
+        -----------------------------
+        Returns
+        -------
+        datetime.date object
+        """
         start_date = _value(conf_obj.get('Default', 'start'))
         if start_date:
             try:
@@ -57,7 +66,7 @@ class _BaseReader():
             try:
                 days = int(conf_obj.get('Default', 'td_days'))
                 default_date = datetime.date.today() - datetime.timedelta(days=days)
-            except configparser.NoOptionError as e:
+            except Exception as e:
                 print(f"{e} in config.ini file\nTry 'markdata config --help' for help.")
         return default_date
 
@@ -88,28 +97,23 @@ def _database_max_date(db_con, db_table):
         return None
 
 
-def _sanitize_dates(start, end):
-    """
-    Return (datetime start, datetime end) tuple
-    -------------------------------------------
+def _sanitize_dates(start: datetime.date, end: datetime.date) -> tuple:
+    """Check that the start and end dates make sense
+    ---------------------------------------------
     Parameters
-    `start` : datetime.date,
-    `end` : datetime.date,
+    ----------
+    `start` : datetime.date object\n
+    `end` : datetime.date object\n
+    Returns
+    -------
+    iso format date strings - (start, end) tuple\n
     """
-    try:
-        db_path = f"{conf_obj.get('Default', 'work_dir')}/{conf_obj.get('Default', 'database')}"
-        db_table = 'ohlc' if _value(conf_obj.get('Default', 'db_table')) is None else conf_obj.get('Default', 'db_table')
-        if os.path.isfile(db_path):
-            with DatabaseConnectionManager(db_path=db_path, mode='ro') as cursor:
-                cursor.execute(f"SELECT Date FROM {db_table} WHERE ROWID IN (SELECT max(ROWID) FROM {db_table});")
-                db_date = cursor.fetchone()
-    except Exception as e:
-        print(f"{e}\nTry 'markdata config --help' for help.")
-    # if db_date:
-    #     start = db_date if (db_date > start) else start
-    # if start > end:
-    #     raise ValueError("start must be an earlier date than end")
-    return start, end
+    if start > end:
+        raise ValueError('start must be earlier than end')
+    return(
+        datetime.datetime.strftime(start, '%Y-%m-%d'),
+        datetime.datetime.strftime(end, '%Y-%m-%d')
+    )
 
 # =======
 

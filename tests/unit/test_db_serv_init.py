@@ -4,19 +4,29 @@ import unittest
 from unittest.mock import patch
 
 from src import conf_obj, config_file
-from src.data_service import _BaseReader, _database_max_date
+from src.data_service import _BaseReader, _database_max_date, _sanitize_dates
 
 
 conf_obj.read(config_file)
 
 
-class SanitizeDatesTest(unittest.TestCase):
+class SanitizeDateTest(unittest.TestCase):
     def setUp(self) -> None:
-        return super().setUp()
+        logging.disable(logging.CRITICAL)
 
     def tearDown(self) -> None:
-        return super().tearDown()
+        logging.disable(logging.NOTSET)
 
+    def test_iso_format_string_is_returned(self):
+        start = datetime.datetime.strptime('1999-12-31', '%Y-%m-%d').date()
+        end = datetime.datetime.strptime('2000-1-1', '%Y-%m-%d').date()
+        result = _sanitize_dates(start=start, end=end)
+        self.assertEqual(result, ('1999-12-31', '2000-01-01'))
+
+    def test_start_gt_end_raises_value_error(self):
+        start = datetime.datetime.strptime('2000-1-1', '%Y-%m-%d').date()
+        end = datetime.datetime.strptime('1999-12-31', '%Y-%m-%d').date()
+        self.assertRaises(ValueError, _sanitize_dates, start, end)
 
 
 class DefaultEndDateTest(unittest.TestCase):
@@ -64,7 +74,7 @@ class DefaultStartDateTest(unittest.TestCase):
         self.assertEqual(result, datetime.date.today() - datetime.timedelta(days=self.days))
 
 
-class _BaseReaderTest(unittest.TestCase):
+class BaseReaderTest(unittest.TestCase):
 
     def setUp(self) -> None:
         logging.disable(logging.CRITICAL)
@@ -78,7 +88,7 @@ class _BaseReaderTest(unittest.TestCase):
         self.assertIsInstance(self.reader, _BaseReader)
 
 
-class _database_max_date_Test(unittest.TestCase):
+class DatabaseMaxDateTest(unittest.TestCase):
 
     def setUp(self) -> None:
         self.db_table = 'data'
