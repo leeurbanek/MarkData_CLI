@@ -79,7 +79,7 @@ def _database_max_date(db_con, db_table):
     ----------
     `db_con` : sqlite3.Connection object
         Connection to the time series database.\n
-    `table_name` : string
+    `db_table` : string
         Name of the table to check.\n
     Returns
     -------

@@ -1,7 +1,7 @@
 import datetime, logging, sqlite3
 
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from src import conf_obj, config_file
 from src.data_service import _BaseReader, _database_max_date, _sanitize_dates
@@ -18,30 +18,33 @@ class SanitizeDateTest(unittest.TestCase):
     def tearDown(self) -> None:
         logging.disable(logging.NOTSET)
 
-    def test_db_max_date_used_if_gt_default_date(self):
-        db = sqlite3.connect("file::memory:?cache=shared", detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES, uri=True)
-        rows = [
-            (datetime.date.today() - datetime.timedelta(days=5), 1),
-            (datetime.date.today() - datetime.timedelta(days=4), 2),
-            (datetime.date.today() - datetime.timedelta(days=3), 3),
-        ]
-        with db as db_con:
-            cursor = db_con.cursor()
-            cursor.execute(f'''
-                CREATE TABLE {self.db_table} (
-                    Date    DATE        NOT NULL,
-                    Row     INTEGER     NOT NULL,
-                    PRIMARY KEY (Date)
-                );
-            ''')
-            cursor.executemany('INSERT INTO data VALUES (?,?)', rows)
-            start = datetime.date.today() - datetime.timedelta(days=30)
-            end = datetime.date.today()
-            result = _sanitize_dates(start=start, end=end)
-            self.assertEqual(result, (
-                datetime.datetime.strftime(datetime.date.today() - datetime.timedelta(days=2), '%Y-%m-%d'),
-                datetime.datetime.strftime(datetime.date.today(), '%Y-%m-%d')
-            ))
+    # @unittest.skip('work in progress')
+    @patch('src.data_service._database_max_date')
+    def test_db_max_date_used_if_gt_default_date(self, mock_db_max_date):
+    # db = sqlite3.connect("file::memory:?cache=shared", detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES, uri=True)
+    # rows = [
+    #     (datetime.date.today() - datetime.timedelta(days=5), 1),
+    #     (datetime.date.today() - datetime.timedelta(days=4), 2),
+    #     (datetime.date.today() - datetime.timedelta(days=3), 3),
+    # ]
+    # with db as db_con:
+    #     cursor = db_con.cursor()
+    #     cursor.execute(f'''
+    #         CREATE TABLE {self.db_table} (
+    #             Date    DATE        NOT NULL,
+    #             Row     INTEGER     NOT NULL,
+    #             PRIMARY KEY (Date)
+    #         );
+    #     ''')
+    #     cursor.executemany('INSERT INTO data VALUES (?,?)', rows)
+        start = datetime.date.today() - datetime.timedelta(days=30)
+        end = datetime.date.today()
+        mock_db_max_date.return_value = datetime.date.today() - datetime.timedelta(days=3)
+        result = _sanitize_dates(start=start, end=end)
+        self.assertEqual(result, (
+            datetime.datetime.strftime(datetime.date.today() - datetime.timedelta(days=2), '%Y-%m-%d'),
+            datetime.datetime.strftime(datetime.date.today(), '%Y-%m-%d')
+        ))
 
     def test_iso_format_string_is_returned(self):
         start = datetime.datetime.strptime('1999-12-31', '%Y-%m-%d').date()
