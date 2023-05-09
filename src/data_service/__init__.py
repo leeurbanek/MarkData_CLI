@@ -71,13 +71,13 @@ class _BaseReader():
         return default_date
 
 
-def _database_max_date(db_con, db_table):
+def _database_max_date(db_cur, db_table):
     """Get the date of the last record in the table.
     ---------------------------------------------
     If table has no records return None.\n
     Parameters
     ----------
-    `db_con` : sqlite3.Connection object
+    `db_cur` : sqlite3.Connection object
         Connection to the time series database.\n
     `db_table` : string
         Name of the table to check.\n
@@ -85,16 +85,19 @@ def _database_max_date(db_con, db_table):
     -------
     datetime.date object or None.\n
     """
-    cursor = db_con.cursor()
     try:
-        cursor.execute(f"SELECT Date FROM {db_table} WHERE ROWID IN (SELECT max(ROWID) FROM {db_table});")
+        sql = db_cur.execute(f'''
+            SELECT Date FROM {db_table}
+            WHERE ROWID IN (
+            SELECT max(ROWID) FROM {db_table}
+            );
+        ''')
+        if sql.fetchone():
+            print(f"\n******* sql.fetchone(): {sql.fetchone()}")
+            return sql.fetchone()[0]
     except Exception as e:
         print(f"{e}\nTry 'markdata config --help' for help.")
-    result = cursor.fetchone()
-    if result:
-        return result[0]
-    else:
-        return None
+    return None
 
 
 def _sanitize_dates(start: datetime.date, end: datetime.date) -> tuple:
@@ -108,6 +111,15 @@ def _sanitize_dates(start: datetime.date, end: datetime.date) -> tuple:
     -------
     iso format date strings - (start, end) tuple\n
     """
+    db_path = f"{conf_obj.get('Default', 'work_dir')}/{conf_obj.get('Default', 'database')}"
+    if os.path.isfile(f"{conf_obj.get('Default', 'work_dir')}/{conf_obj.get('Default', 'database')}"):
+        with DatabaseConnectionManager(db_path=db_path, mode='ro') as db_cur:
+            db_table = f"{conf_obj.get('Default', 'db_table')}"
+            db_date = _database_max_date(db_cur=db_cur, db_table=db_table)
+            if db_date:
+                pass
+    # if db_date > start:
+    #     start = db_date + datetime.timedelta(days=1)
     if start > end:
         raise ValueError('start must be earlier than end')
     return(
