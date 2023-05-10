@@ -86,19 +86,12 @@ def _database_max_date(db_cur, db_table):
     datetime.date object or None.\n
     """
     try:
-        sql = db_cur.execute(f'''
-            SELECT Date FROM {db_table}
-            WHERE ROWID IN (
-            SELECT max(ROWID) FROM {db_table}
-            );
-        ''')
-        if sql.fetchone():
-            print(f"\n******* sql.fetchone(): {sql.fetchone()}")
-            return sql.fetchone()[0]
+        db_date = db_cur.execute(f"SELECT Date FROM {db_table} WHERE ROWID IN (SELECT max(ROWID) FROM {db_table})").fetchone()
+        if db_date:
+            return db_date[0]
     except Exception as e:
         print(f"{e}\nTry 'markdata config --help' for help.")
     return None
-
 
 def _sanitize_dates(start: datetime.date, end: datetime.date) -> tuple:
     """Check that the start and end dates make sense

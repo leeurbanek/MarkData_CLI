@@ -144,8 +144,6 @@ class DatabaseMaxDateTest(unittest.TestCase):
             ''')
             db_cur.executemany('INSERT INTO data VALUES (?,?)', rows)
             db_date = _database_max_date(db_cur, self.db_table)
-            sql = db_cur.execute(f'SELECT * FROM {self.db_table};')
-            print(f"\n******* sql.fetchall(): {sql.fetchall()}")
             self.assertEqual(db_date, datetime.date.today())
 
     def test_database_max_date_with_no_data_in_table(self):
