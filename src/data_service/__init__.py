@@ -109,10 +109,9 @@ def _sanitize_dates(start: datetime.date, end: datetime.date) -> tuple:
         with DatabaseConnectionManager(db_path=db_path, mode='ro') as db_cur:
             db_table = f"{conf_obj.get('Default', 'db_table')}"
             db_date = _database_max_date(db_cur=db_cur, db_table=db_table)
-            if db_date:
-                pass
-    # if db_date > start:
-    #     start = db_date + datetime.timedelta(days=1)
+            print(f"\n*** _sanitize_dates db_date: {db_date}")
+            if db_date > start:
+                start = db_date + datetime.timedelta(days=1)
     if start > end:
         raise ValueError('start must be earlier than end')
     return(

@@ -51,7 +51,8 @@ class DatabaseConnectionManager:
             )
             self.cursor = self.connection.cursor()
             logger.debug(f"connected '{os.path.basename(self.db_path)}', mode: {self.mode}")
-            return self.cursor
+            # return self.cursor
+            return self
         except sqlite3.Error as e:
             print(f'{e}: {self.db_path}')
 
@@ -137,17 +138,17 @@ if __name__ == '__main__':
             ]
 
         def test_db_ctx_mgr_in_memory_mode(self):
-            with DatabaseConnectionManager() as db_cur:
-                db_cur.execute(f'''
+            with DatabaseConnectionManager() as db:
+                db.cursor.execute(f'''
                     CREATE TABLE {self.db_table} (
                         Date    DATE        NOT NULL,
                         Field   INTEGER     NOT NULL,
                         PRIMARY KEY (Date)
                     );
                 ''')
-                db_cur.executemany(f'INSERT INTO {self.db_table} VALUES (?,?)', self.rows)
+                db.cursor.executemany(f'INSERT INTO {self.db_table} VALUES (?,?)', self.rows)
                 try:
-                    sql = db_cur.execute(f"SELECT Field FROM {self.db_table} WHERE ROWID IN (SELECT max(ROWID) FROM {self.db_table});")
+                    sql = db.cursor.execute(f"SELECT Field FROM {self.db_table} WHERE ROWID IN (SELECT max(ROWID) FROM {self.db_table});")
                     result = sql.fetchone()
                 except Exception as e:
                     print(f"{e}")
