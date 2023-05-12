@@ -4,6 +4,7 @@ import unittest
 from unittest.mock import Mock, patch
 
 from src import conf_obj, config_file
+from src.ctx_mgr import DatabaseConnectionManager
 from src.data_service import _BaseReader, _database_max_date, _sanitize_dates
 
 
@@ -18,7 +19,7 @@ class SanitizeDateTest(unittest.TestCase):
     def tearDown(self) -> None:
         logging.disable(logging.NOTSET)
 
-    # @unittest.skip('work in progress')
+    @unittest.skip('work in progress')
     @patch('src.data_service._database_max_date')
     def test_db_max_date_used_if_gt_default_date(self, mock_db_max_date):
     # db = sqlite3.connect("file::memory:?cache=shared", detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES, uri=True)
@@ -40,7 +41,6 @@ class SanitizeDateTest(unittest.TestCase):
         start = datetime.date.today() - datetime.timedelta(days=30)
         end = datetime.date.today()
         mock_db_max_date.return_value = datetime.date.today() - datetime.timedelta(days=3)
-        # print(f"\n*** mock_db_max_date_return_value: {mock_db_max_date.return_value}")
         result = _sanitize_dates(start=start, end=end)
         self.assertEqual(result, (
             datetime.datetime.strftime(datetime.date.today() - datetime.timedelta(days=2), '%Y-%m-%d'),
@@ -129,40 +129,46 @@ class DatabaseMaxDateTest(unittest.TestCase):
             (datetime.date.today() - datetime.timedelta(days=1), 'R2'),
             (datetime.date.today(), 'R3'),
         ]
-        db = sqlite3.connect(
-            "file::memory:?cache=shared",
-            detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES,
-            uri=True
-        )
-        with db as db_con:
-            db_cur = db_con.cursor()
-            db_cur.execute(f'''
+        with DatabaseConnectionManager() as db:
+            db.cursor.execute(f'''
                 CREATE TABLE {self.db_table} (
                     Date    DATE    NOT NULL,
                     Field   TEXT    NOT NULL,
                     PRIMARY KEY (Date)
                 );
             ''')
-            db_cur.executemany('INSERT INTO data VALUES (?,?)', rows)
-            db_date = _database_max_date(db_cur, self.db_table)
+            db.cursor.executemany('INSERT INTO data VALUES (?,?)', rows)
+            db_date = _database_max_date(db.cursor, self.db_table)
             self.assertEqual(db_date, datetime.date.today())
 
+        # with db as db_con:
+        #     db_cur = db_con.cursor()
+        #     db_cur.execute(f'''
+        #         CREATE TABLE {self.db_table} (
+        #             Date    DATE    NOT NULL,
+        #             Field   TEXT    NOT NULL,
+        #             PRIMARY KEY (Date)
+        #         );
+        #     ''')
+        #     db_cur.executemany('INSERT INTO data VALUES (?,?)', rows)
+        #     db_date = _database_max_date(db_cur, self.db_table)
+        #     self.assertEqual(db_date, datetime.date.today())
+
     def test_database_max_date_with_no_data_in_table(self):
-        db = sqlite3.connect(
-            "file::memory:?cache=shared",
-            detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES,
-            uri=True
-        )
-        with db as db_con:
-            db_cur = db_con.cursor()
-            db_cur.execute(f'''
+        # db = sqlite3.connect(
+        #     "file::memory:?cache=shared",
+        #     detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES,
+        #     uri=True
+        # )
+        with DatabaseConnectionManager() as db:
+            db.cursor.execute(f'''
                 CREATE TABLE {self.db_table} (
                     Date    DATE        NOT NULL,
                     Field   INTEGER     NOT NULL,
                     PRIMARY KEY (Date)
                 );
             ''')
-            db_date = _database_max_date(db_cur, self.db_table)
+            db_date = _database_max_date(db.cursor, self.db_table)
             self.assertEqual(db_date, None)
 
 

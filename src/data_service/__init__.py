@@ -11,13 +11,35 @@ conf_obj.read(config_file)
 
 class _BaseReader():
     """"""
-    def __init__(self, api_key=None, end=None, freq=None, start=None, symbol=None) -> None:
+    def __init__(self, api_key=None, db_date=None, end=None, freq=None, start=None, symbol=None) -> None:
         self.api_key = api_key
         self.freq = freq
         self.symbol = symbol
+        self.db_date = self.database_date
         start, end = _sanitize_dates(self.default_start_date, self.default_end_date)
         self.start = start
         self.end = end
+
+    def __repr__(self) -> str:
+        return (
+            f'_BaseReader({self.api_key!r}, '
+            f'{self.db_date!r}, '
+            f'{self.end!r}, '
+            f'{self.freq!r}, '
+            f'{self.start!r}, '
+            f'{self.symbol!r})'
+        )
+
+    @staticmethod
+    def database_date():
+        """
+        Most recent date from database
+        ------------------------------
+        Returns
+        -------
+        datetime.date object
+        """
+        pass
 
     @property
     def params(self):
@@ -109,7 +131,6 @@ def _sanitize_dates(start: datetime.date, end: datetime.date) -> tuple:
         with DatabaseConnectionManager(db_path=db_path, mode='ro') as db_cur:
             db_table = f"{conf_obj.get('Default', 'db_table')}"
             db_date = _database_max_date(db_cur=db_cur, db_table=db_table)
-            print(f"\n*** _sanitize_dates db_date: {db_date}")
             if db_date > start:
                 start = db_date + datetime.timedelta(days=1)
     if start > end:

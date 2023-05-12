@@ -35,7 +35,7 @@ class DatabaseConnectionManager:
         read-write-create 'rwc', or pure in-memory database 'memory' (default) mode.\n
     Returns
     -------
-    An Sqlite3 cursor object.\n
+    An Sqlite3 connection object.\n
     """
     def __init__(self, db_path='test.db', mode='memory'):
         self.db_path = db_path
