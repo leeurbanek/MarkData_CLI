@@ -7,6 +7,11 @@ from src.ctx_mgr import DatabaseConnectionManager
 
 
 conf_obj.read(config_file)
+try:
+    db_path = f"{conf_obj.get('Default', 'work_dir')}/{conf_obj.get('Default', 'database')}"
+    db_table = f"{conf_obj.get('Default', 'db_table')}"
+except Exception as e:
+    print(f"{e} in config.ini file\nTry 'markdata config --help' for help.")
 
 
 class _BaseReader():
@@ -15,7 +20,7 @@ class _BaseReader():
         self.api_key = api_key
         self.freq = freq
         self.symbol = symbol
-        self.db_date = self.database_date
+        self.db_date = self.database_date(db_path)
         start, end = _sanitize_dates(self.default_start_date, self.default_end_date)
         self.start = start
         self.end = end
@@ -31,7 +36,7 @@ class _BaseReader():
         )
 
     @staticmethod
-    def database_date():
+    def database_date(db_path=None, db_table=None):
         """
         Most recent date from database
         ------------------------------
@@ -39,7 +44,12 @@ class _BaseReader():
         -------
         datetime.date object
         """
-        pass
+        if os.path.isfile(db_path):
+            with DatabaseConnectionManager(db_path=db_path, mode='ro') as db:
+                db_cur = db.cursor
+                return _database_max_date(db_cur=db_cur, db_table=db_table)
+        else:
+            return None
 
     @property
     def params(self):
@@ -115,8 +125,9 @@ def _database_max_date(db_cur, db_table):
         print(f"{e}\nTry 'markdata config --help' for help.")
     return None
 
+
 def _sanitize_dates(start: datetime.date, end: datetime.date) -> tuple:
-    """Check that the start and end dates make sense
+    """Check t1hat the start and end dates make sense
     ---------------------------------------------
     Parameters
     ----------

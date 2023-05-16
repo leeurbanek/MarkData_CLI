@@ -1,5 +1,5 @@
 import datetime, logging, sqlite3
-
+import os
 import unittest
 from unittest.mock import Mock, patch
 
@@ -19,7 +19,7 @@ class SanitizeDateTest(unittest.TestCase):
     def tearDown(self) -> None:
         logging.disable(logging.NOTSET)
 
-    @unittest.skip('work in progress')
+    # @unittest.skip('work in progress')
     @patch('src.data_service._database_max_date')
     def test_db_max_date_used_if_gt_default_date(self, mock_db_max_date):
     # db = sqlite3.connect("file::memory:?cache=shared", detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES, uri=True)
@@ -57,6 +57,46 @@ class SanitizeDateTest(unittest.TestCase):
         start = datetime.datetime.strptime('2000-1-1', '%Y-%m-%d').date()
         end = datetime.datetime.strptime('1999-12-31', '%Y-%m-%d').date()
         self.assertRaises(ValueError, _sanitize_dates, start, end)
+
+
+class DatabaseDateTest(unittest.TestCase):
+    def setUp(self) -> None:
+        logging.disable(logging.CRITICAL)
+        self.db_path = 'test.sqlite'
+        self.db_table = 'data'
+        self.reader = _BaseReader()
+        print(f"\n\n******** self.reader(): {self.reader}\n")
+
+    def tearDown(self) -> None:
+        logging.disable(logging.NOTSET)
+        del self.reader
+
+    @patch('os.path.isfile')
+    def test_database_date_with_no_database(self, mock_os_is_file):
+        mock_os_is_file.return_value =  False
+        result = self.reader.database_date()
+        self.assertEqual(result, None)
+
+    @patch('os.path.isfile')
+    def test_database_date_with_database(self, mock_os_is_file):
+        rows = [
+            (datetime.date.today() - datetime.timedelta(days=2), 'R1'),
+            (datetime.date.today() - datetime.timedelta(days=1), 'R2'),
+            (datetime.date.today(), 'R3'),
+        ]
+        with DatabaseConnectionManager(db_path=self.db_path, mode='rwc') as db:
+            db.cursor.execute(f'''
+                CREATE TABLE {self.db_table} (
+                    Date    DATE    NOT NULL,
+                    Field   TEXT    NOT NULL,
+                    PRIMARY KEY (Date)
+                );
+            ''')
+            db.cursor.executemany('INSERT INTO data VALUES (?,?)', rows)
+        mock_os_is_file.return_value =  True
+        result = self.reader.database_date(db_path=self.db_path, db_table=self.db_table)
+        self.assertEqual(result, datetime.date.today())
+        os.remove(self.db_path)
 
 
 class DefaultEndDateTest(unittest.TestCase):
@@ -121,7 +161,11 @@ class BaseReaderTest(unittest.TestCase):
 class DatabaseMaxDateTest(unittest.TestCase):
 
     def setUp(self) -> None:
+        logging.disable(logging.CRITICAL)
         self.db_table = 'data'
+
+    def tearDown(self) -> None:
+        return super().tearDown()
 
     def test_database_max_date_with_data_in_table(self):
         rows = [
@@ -134,7 +178,7 @@ class DatabaseMaxDateTest(unittest.TestCase):
                 CREATE TABLE {self.db_table} (
                     Date    DATE    NOT NULL,
                     Field   TEXT    NOT NULL,
-                    PRIMARY KEY (Date)
+                    PRIMARY           KEY (Date)
                 );
             ''')
             db.cursor.executemany('INSERT INTO data VALUES (?,?)', rows)
