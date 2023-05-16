@@ -19,7 +19,6 @@ class SanitizeDateTest(unittest.TestCase):
     def tearDown(self) -> None:
         logging.disable(logging.NOTSET)
 
-    # @unittest.skip('work in progress')
     @patch('src.data_service._database_max_date')
     def test_db_max_date_used_if_gt_default_date(self, mock_db_max_date):
     # db = sqlite3.connect("file::memory:?cache=shared", detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES, uri=True)
@@ -38,25 +37,28 @@ class SanitizeDateTest(unittest.TestCase):
     #         );
     #     ''')
     #     db_cur.executemany('INSERT INTO data VALUES (?,?)', rows)
+        db_date = datetime.date.today() - datetime.timedelta(days=3)
         start = datetime.date.today() - datetime.timedelta(days=30)
         end = datetime.date.today()
         mock_db_max_date.return_value = datetime.date.today() - datetime.timedelta(days=3)
-        result = _sanitize_dates(start=start, end=end)
+        result = _sanitize_dates(db_date=db_date, start=start, end=end)
         self.assertEqual(result, (
             datetime.datetime.strftime(datetime.date.today() - datetime.timedelta(days=2), '%Y-%m-%d'),
             datetime.datetime.strftime(datetime.date.today(), '%Y-%m-%d')
         ))
 
     def test_iso_format_string_is_returned(self):
+        db_date = None
         start = datetime.datetime.strptime('1999-12-31', '%Y-%m-%d').date()
         end = datetime.datetime.strptime('2000-1-1', '%Y-%m-%d').date()
-        result = _sanitize_dates(start=start, end=end)
+        result = _sanitize_dates(db_date= db_date, start=start, end=end)
         self.assertEqual(result, ('1999-12-31', '2000-01-01'))
 
     def test_start_gt_end_raises_value_error(self):
+        db_date = None
         start = datetime.datetime.strptime('2000-1-1', '%Y-%m-%d').date()
         end = datetime.datetime.strptime('1999-12-31', '%Y-%m-%d').date()
-        self.assertRaises(ValueError, _sanitize_dates, start, end)
+        self.assertRaises(ValueError, _sanitize_dates, db_date, start, end)
 
 
 class DatabaseDateTest(unittest.TestCase):

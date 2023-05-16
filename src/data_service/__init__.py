@@ -1,6 +1,7 @@
 """src.data_service.__init__.py"""
 import datetime
 import os
+from typing import Union
 
 from src import config_file, conf_obj, _value
 from src.ctx_mgr import DatabaseConnectionManager
@@ -21,18 +22,18 @@ class _BaseReader():
         self.freq = freq
         self.symbol = symbol
         self.db_date = self.database_date(db_path)
-        start, end = _sanitize_dates(self.default_start_date, self.default_end_date)
+        start, end = _sanitize_dates(self.db_date, self.default_start_date, self.default_end_date)
         self.start = start
         self.end = end
 
     def __repr__(self) -> str:
         return (
-            f'_BaseReader({self.api_key!r}, '
-            f'{self.db_date!r}, '
-            f'{self.end!r}, '
-            f'{self.freq!r}, '
-            f'{self.start!r}, '
-            f'{self.symbol!r})'
+            f'_BaseReader(api_key={self.api_key!r}, '
+            f'db_date={self.db_date!r}, '
+            f'end={self.end!r}, '
+            f'freq={self.freq!r}, '
+            f'start={self.start!r}, '
+            f'symbol={self.symbol!r})'
         )
 
     @staticmethod
@@ -126,7 +127,7 @@ def _database_max_date(db_cur, db_table):
     return None
 
 
-def _sanitize_dates(start: datetime.date, end: datetime.date) -> tuple:
+def _sanitize_dates(db_date: Union[datetime.datetime, None], start: datetime.date, end: datetime.date) -> tuple:
     """Check t1hat the start and end dates make sense
     ---------------------------------------------
     Parameters
@@ -137,13 +138,8 @@ def _sanitize_dates(start: datetime.date, end: datetime.date) -> tuple:
     -------
     iso format date strings - (start, end) tuple\n
     """
-    db_path = f"{conf_obj.get('Default', 'work_dir')}/{conf_obj.get('Default', 'database')}"
-    if os.path.isfile(f"{conf_obj.get('Default', 'work_dir')}/{conf_obj.get('Default', 'database')}"):
-        with DatabaseConnectionManager(db_path=db_path, mode='ro') as db_cur:
-            db_table = f"{conf_obj.get('Default', 'db_table')}"
-            db_date = _database_max_date(db_cur=db_cur, db_table=db_table)
-            if db_date > start:
-                start = db_date + datetime.timedelta(days=1)
+    if db_date:
+        start = db_date + datetime.timedelta(days=1)
     if start > end:
         raise ValueError('start must be earlier than end')
     return(
