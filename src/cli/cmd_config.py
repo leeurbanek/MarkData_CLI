@@ -113,17 +113,15 @@ DESCRIPTION
 
 # config Ticker
 @click.option(
-    '-s', '--symbol', 'opt_trans', flag_value='symbol',
+    '--symbol', 'opt_trans', flag_value='symbol',
     help=f"Add/remove ticker symbols, current: '{conf_obj.get('Ticker', 'symbol')}'"
 )
 
 # config Work directory
 @click.option(
-    '-w', '--work-dir', 'opt_trans', flag_value='work_dir',
+    '--work-dir', 'opt_trans', flag_value='work_dir',
     help=f"Change working directory, current: '{conf_obj.get('Default', 'work_dir')}'"
 )
-
-
 
 @click.pass_context
 def cli(ctx, opt_trans, arguments):
@@ -161,3 +159,13 @@ def cli(ctx, opt_trans, arguments):
             if new_value:
                 section[opt_trans] = new_value
                 write_new_value_to_config()
+
+"""
+[Default]
+database = db.sqlite
+db_table = None
+work_dir = temp
+start =
+end =
+td_days = 30
+"""

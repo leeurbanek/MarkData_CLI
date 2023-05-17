@@ -21,22 +21,6 @@ class SanitizeDateTest(unittest.TestCase):
 
     @patch('src.data_service._database_max_date')
     def test_db_max_date_used_if_gt_default_date(self, mock_db_max_date):
-    # db = sqlite3.connect("file::memory:?cache=shared", detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES, uri=True)
-    # rows = [
-    #     (datetime.date.today() - datetime.timedelta(days=5), 1),
-    #     (datetime.date.today() - datetime.timedelta(days=4), 2),
-    #     (datetime.date.today() - datetime.timedelta(days=3), 3),
-    # ]
-    # with db as db_con:
-    #     db_cur = db_con.db_cur()
-    #     db_cur.execute(f'''
-    #         CREATE TABLE {self.db_table} (
-    #             Date    DATE        NOT NULL,
-    #             Row     INTEGER     NOT NULL,
-    #             PRIMARY KEY (Date)
-    #         );
-    #     ''')
-    #     db_cur.executemany('INSERT INTO data VALUES (?,?)', rows)
         db_date = datetime.date.today() - datetime.timedelta(days=3)
         start = datetime.date.today() - datetime.timedelta(days=30)
         end = datetime.date.today()
@@ -67,7 +51,6 @@ class DatabaseDateTest(unittest.TestCase):
         self.db_path = 'test.sqlite'
         self.db_table = 'data'
         self.reader = _BaseReader()
-        print(f"\n\n******** self.reader(): {self.reader}\n")
 
     def tearDown(self) -> None:
         logging.disable(logging.NOTSET)
@@ -147,7 +130,6 @@ class DefaultStartDateTest(unittest.TestCase):
 
 
 class BaseReaderTest(unittest.TestCase):
-
     def setUp(self) -> None:
         logging.disable(logging.CRITICAL)
         self.reader = _BaseReader()
@@ -161,7 +143,6 @@ class BaseReaderTest(unittest.TestCase):
 
 
 class DatabaseMaxDateTest(unittest.TestCase):
-
     def setUp(self) -> None:
         logging.disable(logging.CRITICAL)
         self.db_table = 'data'
@@ -187,25 +168,7 @@ class DatabaseMaxDateTest(unittest.TestCase):
             db_date = _database_max_date(db.cursor, self.db_table)
             self.assertEqual(db_date, datetime.date.today())
 
-        # with db as db_con:
-        #     db_cur = db_con.cursor()
-        #     db_cur.execute(f'''
-        #         CREATE TABLE {self.db_table} (
-        #             Date    DATE    NOT NULL,
-        #             Field   TEXT    NOT NULL,
-        #             PRIMARY KEY (Date)
-        #         );
-        #     ''')
-        #     db_cur.executemany('INSERT INTO data VALUES (?,?)', rows)
-        #     db_date = _database_max_date(db_cur, self.db_table)
-        #     self.assertEqual(db_date, datetime.date.today())
-
     def test_database_max_date_with_no_data_in_table(self):
-        # db = sqlite3.connect(
-        #     "file::memory:?cache=shared",
-        #     detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES,
-        #     uri=True
-        # )
         with DatabaseConnectionManager() as db:
             db.cursor.execute(f'''
                 CREATE TABLE {self.db_table} (
