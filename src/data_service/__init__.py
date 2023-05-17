@@ -144,24 +144,3 @@ def _sanitize_dates(db_date: Union[datetime.datetime, None], start: datetime.dat
         datetime.datetime.strftime(start, '%Y-%m-%d'),
         datetime.datetime.strftime(end, '%Y-%m-%d')
     )
-
-# =======
-
-# self.ctx_obj = {
-#     'Default': {
-#         'database': 'db.sqlite',
-#         'db_table': 'None',
-#         'work_dir': 'temp',
-#         'start': 'None',
-#         'end': 'None'
-#     },
-#     'Scraper': {
-#         'adblock': 'None',
-#         'base_url': 'https://stockcharts.com/h-sc/ui?s=',
-#         'driver': 'chromedriver'
-#     },
-#     'Ticker': {
-#         'symbol': 'EEM, IWM'
-#     },
-#     'debug': True, 'opt_trans': 'alpha', 'symbol': ['EEM', 'IWM']
-# }

@@ -4,7 +4,6 @@ import os
 import click
 
 from src import config_file, conf_obj
-from src.ctx_mgr import DatabaseConnectionManager
 
 
 conf_obj.read(config_file)
@@ -101,6 +100,15 @@ DESCRIPTION
     The config utility writes any specified arguments, separated
     by single blank (' ') characters, to the config.ini file.
     Use absolute paths for directories, etc.  Quotes are not needed.
+
+[Default]
+database = db.sqlite
+db_table = None
+work_dir = temp
+start =
+end =
+td_days = 30
+
 """)
 
 @click.argument('arguments', nargs=-1, default=None, required=False, type=str)
@@ -159,13 +167,3 @@ def cli(ctx, opt_trans, arguments):
             if new_value:
                 section[opt_trans] = new_value
                 write_new_value_to_config()
-
-"""
-[Default]
-database = db.sqlite
-db_table = None
-work_dir = temp
-start =
-end =
-td_days = 30
-"""

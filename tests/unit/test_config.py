@@ -1,6 +1,17 @@
 import unittest
 
-from src.cli import cmd_config
+from src.cli.cmd_config import update_ticker_symbol
+
+
+class UpdateConfigFileTest(unittest.TestCase):
+    def setUp(self) -> None:
+        return super().setUp()
+
+    def tearDown(self) -> None:
+        return super().tearDown()
+
+    def test_write_to_config_func(self):
+        pass
 
 
 class ChartDirConfigTest(unittest.TestCase):
@@ -53,3 +64,24 @@ class ChartDirConfigTest(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+# =======
+
+# self.ctx_obj = {
+#     'Default': {
+#         'database': 'db.sqlite',
+#         'db_table': 'None',
+#         'work_dir': 'temp',
+#         'start': 'None',
+#         'end': 'None'
+#     },
+#     'Scraper': {
+#         'adblock': 'None',
+#         'base_url': 'https://stockcharts.com/h-sc/ui?s=',
+#         'driver': 'chromedriver'
+#     },
+#     'Ticker': {
+#         'symbol': 'EEM, IWM'
+#     },
+#     'debug': True, 'opt_trans': 'alpha', 'symbol': ['EEM', 'IWM']
+# }
