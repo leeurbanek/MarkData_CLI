@@ -101,34 +101,42 @@ DESCRIPTION
     by single blank (' ') characters, to the config.ini file.
     Use absolute paths for directories, etc.  Quotes are not needed.
 
-[Default]
-database = db.sqlite
-db_table = None
-work_dir = temp
-start =
-end =
 td_days = 30
 
 """)
 
 @click.argument('arguments', nargs=-1, default=None, required=False, type=str)
 
-# config Data
+# config Default
 @click.option(
     '--database', 'opt_trans', flag_value='database',
-    help=f"Create new database, current: {conf_obj.get('Default', 'database')}"
+    help=f"Create new database, current: '{conf_obj.get('Default', 'database')}'"
+)
+@click.option(
+    '--db-table', 'opt_trans', flag_value='db_table',
+    help=f"Add/remove database tables, current: '{conf_obj.get('Default', 'db_table')}'"
+)
+@click.option(
+    '--end', 'opt_trans', flag_value='end',
+    help=f"Ending date for the database. If not set today's date is used, current: '{conf_obj.get('Default', 'start')}'"
+)
+@click.option(
+    '--start', 'opt_trans', flag_value='start',
+    help=f"Start date for the OHLC database. If not set 'td_days' offset is used, current: '{conf_obj.get('Default', 'start')}'"
+)
+@click.option(
+    '--td-days', 'opt_trans', flag_value='td_days',
+    help=f"Timedelta days. Lookback period from current date (used if start not set), current: '{conf_obj.get('Default', 'td_days')}'"
+)
+@click.option(
+    '--work-dir', 'opt_trans', flag_value='work_dir',
+    help=f"Change working directory, current: '{conf_obj.get('Default', 'work_dir')}'"
 )
 
 # config Ticker
 @click.option(
     '--symbol', 'opt_trans', flag_value='symbol',
     help=f"Add/remove ticker symbols, current: '{conf_obj.get('Ticker', 'symbol')}'"
-)
-
-# config Work directory
-@click.option(
-    '--work-dir', 'opt_trans', flag_value='work_dir',
-    help=f"Change working directory, current: '{conf_obj.get('Default', 'work_dir')}'"
 )
 
 @click.pass_context

@@ -36,32 +36,6 @@ class ChartDirConfigTest(unittest.TestCase):
         pass
 
 
-# import sys
-
-# def write_lamb(outfile):
-#     outfile.write("Mary had a little lamb.\n")
-
-# if __name__ == '__main__':
-#     with open(sys.argv[1], 'w') as outfile:
-#         write_lamb(outfile)
-
-
-##File test_lamb.py
-# import unittest
-# from io import StringIO
-
-# import lamb
-
-
-# class LambTests(unittest.TestCase):
-#     def test_lamb_output(self):
-#         outfile = StringIO()
-#         lamb.write_lamb(outfile)
-#         outfile.seek(0)
-#         content = outfile.read()
-#         self.assertEqual(content, "Mary had a little lamb.\n")
-
-
 if __name__ == '__main__':
     unittest.main()
 
