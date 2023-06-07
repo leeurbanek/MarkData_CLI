@@ -20,7 +20,7 @@
 ## Installation
 
 Copy or clone this app to your computer. Use Python's built in venv module to create a virtual environment. In the directory where this app located enter `python3 -m venv venv` to create. Start the environment with `source venv/bin/activate` type `pip install --update pip setuptools wheel` to update. Finally `pip install -e .` installs the requirements and also installs the app in editable mode. Type `markdata-cli --help` and you should see:
-``` shell
+```
 Usage: markdata [OPTIONS] COMMAND [ARGS]...
 
   MarkData_CLI: stock MARKet DATA Command Line Interface
