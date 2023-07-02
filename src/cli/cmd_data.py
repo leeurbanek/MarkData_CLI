@@ -72,14 +72,14 @@ SYNOPSIS
 DESCRIPTION
     The data utility attempts to retrieve OHLC data from various
     online sources.  If no ticker symbols are provided the default
-    symbols from the config settings are used.  Try 'data --help'
-    for help with config settings.
+    symbols from the config settings are used.
+    Try 'markdata-cli config --help' for help with config settings.
 """)
 
 @click.argument('symbol', nargs=-1, default=None, required=False, type=str)
 
-@click.option('-a', '--alpha', 'opt_trans', flag_value='alpha', help='Fetch data from https://www.alphavantage.co/')
-@click.option('-t', '--tiingo', 'opt_trans', flag_value='tiingo', help='Fetch data from https://api.tiingo.com/')
+@click.option('--alpha', 'opt_trans', flag_value='alpha', help='Fetch data from https://www.alphavantage.co/')
+@click.option('--tiingo', 'opt_trans', flag_value='tiingo', help='Fetch data from https://api.tiingo.com/')
 
 @click.pass_context
 def cli(ctx, opt_trans, symbol):

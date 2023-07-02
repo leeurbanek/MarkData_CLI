@@ -9,8 +9,8 @@ from src.ctx_mgr import DatabaseConnectionManager
 
 conf_obj.read(config_file)
 try:
-    db_path = f"{conf_obj.get('Default', 'work_dir')}/{conf_obj.get('Default', 'database')}"
-    db_table = f"{conf_obj.get('Default', 'db_table')}"
+    db_path = f"{conf_obj.get('Default', 'work_dir')}/{conf_obj.get('Database', 'db')}"
+    db_table = f"{conf_obj.get('Database', 'db_table')}"
 except Exception as e:
     print(f"{e} in config.ini file\nTry 'markdata config --help' for help.")
 
@@ -69,7 +69,7 @@ class _BaseReader():
         -------
         datetime.date object
         """
-        end_date = _value(conf_obj.get('Default', 'start'))
+        end_date = _value(conf_obj.get('Database', 'start'))
         if end_date:
             try:
                 default_date = datetime.datetime.strptime(end_date, '%Y-%m-%d').date()
@@ -87,7 +87,7 @@ class _BaseReader():
         -------
         datetime.date object
         """
-        start_date = _value(conf_obj.get('Default', 'start'))
+        start_date = _value(conf_obj.get('Database', 'start'))
         if start_date:
             try:
                 default_date = datetime.datetime.strptime(start_date, '%Y-%m-%d').date()
@@ -95,7 +95,7 @@ class _BaseReader():
                 print(f"ERROR: {e}\nin src/data_service/__init__.py default_start_date()")
         else:
             try:
-                days = int(conf_obj.get('Default', 'td_days'))
+                days = int(conf_obj.get('Database', 'td_days'))
                 default_date = datetime.date.today() - datetime.timedelta(days=days)
             except Exception as e:
                 print(f"{e} in config.ini file\nTry 'markdata config --help' for help.")

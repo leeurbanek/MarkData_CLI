@@ -1,5 +1,6 @@
 import logging
 
+from pathlib import Path
 from configparser import ConfigParser
 
 from src import config_file
@@ -21,8 +22,11 @@ def get_chart(ctx):
     period = ctx['period']
     symbol = ctx['symbol']
 
+    # check 'chart' folder exists in users 'work_dir', if not create 'chart' folder
+    Path(f"{conf_obj.get('Default', 'work_dir')}/chart").mkdir(parents=True, exist_ok=True)
+
     if debug: logger.debug(f"get_chart(ctx={ctx})")
-    if not debug: print(f"Saving to '{conf_obj.get('Default', 'work_dir')}'\nstarting download")
+    if not debug: print(f"Saving to '{conf_obj.get('Default', 'work_dir')}/chart'\nstarting download")
 
     # count = len(period) * len(symbol)
     [download(debug, p, s.strip(',')) for p in period for s in symbol]

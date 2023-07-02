@@ -11,12 +11,6 @@ conf_obj.read(config_file)
 logger = logging.getLogger(__name__)
 
 
-def delete_database(conf_obj, ctx_obj):
-    """"""
-    if ctx_obj['debug']:
-        logger.debug(f"delete_database(ctx_obj={ctx_obj['opt_trans']})")
-
-
 def update_ticker_symbol(conf_obj, ctx_obj):
     """"""
     if ctx_obj['debug']:
@@ -100,34 +94,33 @@ DESCRIPTION
     The config utility writes any specified arguments, separated
     by single blank (' ') characters, to the config.ini file.
     Use absolute paths for directories, etc.  Quotes are not needed.
-
-td_days = 30
-
 """)
 
 @click.argument('arguments', nargs=-1, default=None, required=False, type=str)
 
-# config Default
+# config Database
 @click.option(
     '--database', 'opt_trans', flag_value='database',
-    help=f"Create new database, current: '{conf_obj.get('Default', 'database')}'"
+    help=f"Create new database, current: '{conf_obj.get('Database', 'db')}'"
 )
 @click.option(
     '--db-table', 'opt_trans', flag_value='db_table',
-    help=f"Add/remove database tables, current: '{conf_obj.get('Default', 'db_table')}'"
+    help=f"Add/remove database tables, current: '{conf_obj.get('Database', 'db_table')}'"
 )
 @click.option(
     '--end', 'opt_trans', flag_value='end',
-    help=f"Ending date for the database. If not set today's date is used, current: '{conf_obj.get('Default', 'start')}'"
+    help=f"Ending date for the database, current: '{conf_obj.get('Database', 'end')}'. If not set today's date is used."
 )
 @click.option(
     '--start', 'opt_trans', flag_value='start',
-    help=f"Start date for the OHLC database. If not set 'td_days' offset is used, current: '{conf_obj.get('Default', 'start')}'"
+    help=f"Start date for the OHLC database, current: '{conf_obj.get('Database', 'start')}'. If not set 'td_days' lookback is used."
 )
 @click.option(
     '--td-days', 'opt_trans', flag_value='td_days',
-    help=f"Timedelta days. Lookback period from current date (used if start not set), current: '{conf_obj.get('Default', 'td_days')}'"
+    help=f"Timedelta days, current: '{conf_obj.get('Database', 'td_days')}' days. Lookback period from current date (used if start not set)."
 )
+
+# config Default
 @click.option(
     '--work-dir', 'opt_trans', flag_value='work_dir',
     help=f"Change working directory, current: '{conf_obj.get('Default', 'work_dir')}'"
@@ -149,10 +142,10 @@ def cli(ctx, opt_trans, arguments):
         ctx.obj['opt_trans'] = opt_trans  # add opt_trans to ctx
 
         if opt_trans == 'database':
-            section = conf_obj['Default']
+            section = conf_obj['Database']
             ctx.obj['section'] = section  # add section to ctx
             click.confirm(
-                f"Current database: '{ctx.obj['Default']['work_dir']}/{ctx.obj['Default']['database']}'\nDo you want to change this?", abort=True
+                f"Current database: '{ctx.obj['Default']['work_dir']}/{ctx.obj['Database']['db']}'\nDo you want to change this?", abort=True
             )
             new_value =  click.prompt(f"Enter the new {ctx.obj['opt_trans']} name", type=str)
             if new_value:

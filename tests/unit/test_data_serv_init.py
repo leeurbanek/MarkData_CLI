@@ -109,12 +109,12 @@ class DefaultEndDateTest(unittest.TestCase):
 class DefaultStartDateTest(unittest.TestCase):
     def setUp(self) -> None:
         logging.disable(logging.CRITICAL)
-        self.days = int(conf_obj.get('Default', 'td_days'))
+        self.days = int(conf_obj.get('Database', 'td_days'))
         self.reader = _BaseReader()
 
     def tearDown(self) -> None:
         logging.disable(logging.NOTSET)
-        del self.days, self.reader
+        del self.reader
 
     @patch('src.data_service._value')
     def test_start_date_with_config_date_set(self, mock_value):
