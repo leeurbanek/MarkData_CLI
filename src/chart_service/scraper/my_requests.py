@@ -39,7 +39,7 @@ class WebScraper:
         """"""
         if self.debug: logger.debug(f'webscraper({self.symbol}, {self.period})')
         if not self.debug: print(f'  fetching chart: {self.symbol}_{self.period.lower()}.png... ', end=' ')
-        with SpinnerManager():
+        with SpinnerManager(debug=self.debug):
             form = self._get_all_forms()[2]
             details = self._get_form_details(form)
             soup = self._submit_form(details)
