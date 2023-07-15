@@ -77,7 +77,7 @@ class DatabaseDateTest(unittest.TestCase):
                     PRIMARY KEY (Date)
                 );
             ''')
-            db.cursor.executemany('INSERT INTO data VALUES (?,?)', rows)
+            db.cursor.executemany(f'INSERT INTO {self.db_table} VALUES (?,?)', rows)
         mock_os_is_file.return_value =  True
         result = self.reader.database_date(db_path=self.db_path, db_table=self.db_table)
         self.assertEqual(result, datetime.date.today())

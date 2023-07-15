@@ -15,7 +15,6 @@ def get_alpha_data(ctx_obj):
     print(f"reader: {reader}")
 
 
-# def get_tiingo_data(conf_obj, ctx_obj):
 def get_tiingo_data(ctx_obj):
     """"""
     if ctx_obj['debug']:
@@ -38,5 +37,5 @@ def _write_data_to_sqlite_db(ctx_obj, data_list):
     with DatabaseConnectionManager(db_path, mode='rw') as db:
         for data in data_list:
             db.cursor.execute("INSERT INTO ohlc VALUES (?,?,?,?,?,?,?);", data)
-    # for data in data_list:
-    #     print(data)
+        # for data in data_list:
+        #     print(data)

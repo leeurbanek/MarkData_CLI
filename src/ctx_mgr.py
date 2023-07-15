@@ -91,7 +91,7 @@ class SpinnerManager:
 
     def __enter__(self):
         self.busy = True
-        print(f"debug: {self.debug}")
+        # print(f"debug: {self.debug}")
         if self.debug: logger.debug(f"SpinnerManager(debug={self.debug}).__enter__()")
         threading.Thread(target=self.spinner_task).start()
 

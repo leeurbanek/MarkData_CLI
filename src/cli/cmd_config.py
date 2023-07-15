@@ -27,12 +27,12 @@ def update_ticker_symbol(conf_obj, ctx_obj):
     extend, remove = [], []  # create lists
 
     # Add symbols to extend/remove list
-    for v in ctx_symbol:
-        v = v.upper().strip()
-        if v in conf_symbol:
-            remove.append(v)
+    for s in ctx_symbol:
+        s = s.upper().strip()
+        if s in conf_symbol:
+            remove.append(s)
         else:
-            extend.append(v.strip())
+            extend.append(s.strip())
 
     # Extend/remove items in symbol_list
     if extend:
