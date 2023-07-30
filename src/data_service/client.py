@@ -23,7 +23,7 @@ def get_tiingo_data(ctx_obj):
     from src.data_service.reader import TiingoReader
     reader = TiingoReader()
     for symbol in ctx_obj['symbol']:
-        data_list = reader.parse_price_data(symbol.strip(','))
+        data_list = reader.parse_ohlc_price_data(symbol.strip(','))
         _write_data_to_sqlite_db(ctx_obj, data_list)
 
 
@@ -35,7 +35,8 @@ def _write_data_to_sqlite_db(ctx_obj, data_list):
     db_path=f"{ctx_obj['Default']['work_dir']}/{ctx_obj['Database']['db']}"
 
     with DatabaseConnectionManager(db_path, mode='rw') as db:
+        print(f"\n{'':=^30}")
+        for data in data_list:
+            print(data)
         for data in data_list:
             db.cursor.execute("INSERT INTO ohlc VALUES (?,?,?,?,?,?,?);", data)
-        # for data in data_list:
-        #     print(data)

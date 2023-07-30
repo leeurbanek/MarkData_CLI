@@ -50,8 +50,8 @@ class TiingoReader(_BaseReader):
         data = requests.get(f"{self.base_url}/{self.freq}/{symbol}/prices?startDate={self.start}&endDate={self.end}&token={self.api_key}", headers=headers)
         return data.json()
 
-    def parse_price_data(self, symbol):
-        """Returns a generator object"""
+    def parse_ohlc_price_data(self, symbol):
+        """Generator object yields a list"""
         for item in self._read_one_price_data(symbol):
             data = [
                 date(*map(int, item.get('date')[:10].split('-'))),

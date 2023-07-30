@@ -46,7 +46,7 @@ class WebScraper:
                 content = self._get_page_content(driver)
                 src = self._get_img_src(content)
                 self._save_img_to_file(src)
-            if not self.debug: print('\b done')
+            if not self.debug: print('\b done,')
 
     def _get_img_src(self, soup=None):
         """"""
