@@ -103,33 +103,35 @@ DESCRIPTION
     '--database', 'opt_trans', flag_value='database',
     help=f"Create new database, current: '{conf_obj.get('Database', 'db')}'"
 )
-@click.option(
-    '--db-table', 'opt_trans', flag_value='db_table',
-    help=f"Add/remove database tables, current: '{conf_obj.get('Database', 'db_table')}'"
-)
+# # config Database
+# @click.option(
+#     '--db-table', 'opt_trans', flag_value='db_table',
+#     help=f"Add/remove database tables, current: '{conf_obj.get('Database', 'db_table')}'"
+# )
+# config Database
 @click.option(
     '--end', 'opt_trans', flag_value='end',
     help=f"Ending date for the database, current: '{conf_obj.get('Database', 'end')}'. If not set today's date is used."
 )
+# config Database
 @click.option(
     '--start', 'opt_trans', flag_value='start',
     help=f"Start date for the OHLC database, current: '{conf_obj.get('Database', 'start')}'. If not set 'td_days' lookback is used."
 )
-@click.option(
-    '--td-days', 'opt_trans', flag_value='td_days',
-    help=f"Timedelta days, current: '{conf_obj.get('Database', 'td_days')}' days. Lookback period from current date (used if start not set)."
-)
-
-# config Default
-@click.option(
-    '--work-dir', 'opt_trans', flag_value='work_dir',
-    help=f"Change working directory, current: '{conf_obj.get('Default', 'work_dir')}'"
-)
-
 # config Ticker
 @click.option(
     '--symbol', 'opt_trans', flag_value='symbol',
     help=f"Add/remove ticker symbols, current: '{conf_obj.get('Ticker', 'symbol')}'"
+)
+# config Database
+@click.option(
+    '--td-days', 'opt_trans', flag_value='td_days',
+    help=f"Timedelta days, current: '{conf_obj.get('Database', 'td_days')}' days. Lookback period from current date (used if start not set)."
+)
+# config Default
+@click.option(
+    '--work-dir', 'opt_trans', flag_value='work_dir',
+    help=f"Change working directory, current: '{conf_obj.get('Default', 'work_dir')}'"
 )
 
 @click.pass_context
