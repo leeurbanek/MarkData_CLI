@@ -41,4 +41,4 @@ After successful install you will want to setup a few things. First, set the pat
 
 ## Usage
 
-Download stock charts from StockCharts.com see `markdata-cli chart --help`.
+Download stock charts from StockCharts.com try `markdata-cli chart --help`.
