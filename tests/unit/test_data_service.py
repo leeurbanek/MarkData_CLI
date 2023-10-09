@@ -32,9 +32,12 @@ class TiingoReaderTest(unittest.TestCase):
         logging.disable(logging.CRITICAL)
         del self._read_one_price_data
 
+    def test_read_one_price_data(self):
+        pass
+    
     def test_parse_price_data(self):
         data_list = [datetime.date(2023, 3, 31), 'IWM', 17640, 17864, 17637, 17840, 39602850]
-        self.assertEqual(next(TiingoReader.parse_price_data(self, symbol='iwm')), data_list)
+        self.assertEqual(next(TiingoReader.parse_ohlc_price_data(self, symbol='iwm')), data_list)
 
 
 if __name__ == '__main__':

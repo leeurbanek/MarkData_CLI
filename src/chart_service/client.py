@@ -26,12 +26,13 @@ def get_chart(ctx):
     Path(f"{conf_obj.get('Default', 'work_dir')}/chart").mkdir(parents=True, exist_ok=True)
 
     if debug: logger.debug(f"get_chart(ctx={ctx})")
-    if not debug: print(f"Saving to '{conf_obj.get('Default', 'work_dir')}/chart'\nstarting download")
+    if not debug: print('Begin download')
 
     # count = len(period) * len(symbol)
     [download(debug, p, s.strip(',')) for p in period for s in symbol]
     if not debug: print('cleaning up... ', end='')
-    if not debug: print('\b finished.')
+    if not debug: print('\b finished!')
+    if not debug: print(f"Saved charts to '{conf_obj.get('Default', 'work_dir')}/chart'.")
 
 
 def download(debug, period, symbol):

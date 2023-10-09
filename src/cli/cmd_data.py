@@ -1,6 +1,6 @@
 import logging
 import os.path
-from configparser import ConfigParser
+# from configparser import ConfigParser
 
 import click
 
@@ -33,7 +33,7 @@ def _add_database_table(db_con, table_name):
         ''')
 
 
-def _add_ohlc_table(conf_obj, ctx_obj, db_con):
+def _add_ohlc_table(conf_obj, ctx_obj, db):
     """Create the Open, High, Low, Close, AdjCl, Volume table.
     --------------------------------------------------------
     Fields are Date, Symbol, Open, High, Low, Close, Volume.\n
@@ -45,10 +45,10 @@ def _add_ohlc_table(conf_obj, ctx_obj, db_con):
         Connection to the time series database.\n
     """
     if ctx_obj['debug']:
-        logger.debug(f"_add_ohlc_table(db_con={db_con})")
+        logger.debug(f"_add_ohlc_table(db_con={db})")
 
-    db_table = 'ohlc' if _value(ctx_obj['Default']['db_table']) is None else ctx_obj['Default']['db_table']
-    db_con.execute(f'''
+    db_table = 'ohlc' if _value(ctx_obj['Database']['db_table']) is None else ctx_obj['Database']['db_table']
+    db.cursor.execute(f'''
         CREATE TABLE IF NOT EXISTS {db_table} (
             Date    DATE        NOT NULL,
             Symbol  TEXT        NOT NULL,
@@ -59,6 +59,16 @@ def _add_ohlc_table(conf_obj, ctx_obj, db_con):
             Volume  INTEGER     NOT NULL,
             PRIMARY KEY (Date, Symbol));
         ''')
+    # db.cursor.execute(f'''
+    #     CREATE TABLE IF NOT EXISTS {db_table} (
+    #         Date    DATE        NOT NULL,
+    #         Symbol  TEXT        NOT NULL,
+    #         Open    INTEGER     NOT NULL,
+    #         High    INTEGER     NOT NULL,
+    #         Low     INTEGER     NOT NULL,
+    #         Close   INTEGER     NOT NULL,
+    #         PRIMARY KEY (Date, Symbol));
+    #     ''')
 
 
 @click.command('data', short_help="Fetch online OHLC price and volume data", help="""
@@ -92,14 +102,14 @@ def cli(ctx, opt_trans, symbol):
         if ctx.obj['Default']['work_dir'] == 'None':
             click.echo("Error: Work directory not set\nTry 'markdata config --help' for help.")
             return
-        if ctx.obj['Default']['database'] == 'None':
+        if ctx.obj['Database']['db'] == 'None':
             click.echo("Error: The database name is not set\nTry 'markdata config --help' for help.")
             return
         # create database and add talbe if not exist
-        db_path = f"{ctx.obj['Default']['work_dir']}/{ctx.obj['Default']['database']}"
+        db_path = f"{ctx.obj['Default']['work_dir']}/{ctx.obj['Database']['db']}"
         if not os.path.isfile(db_path):
-            with DatabaseConnectionManager(db_path=db_path, mode='rwc') as db_con:
-                _add_ohlc_table(conf_obj=ctx.obj, ctx_obj=ctx.obj, db_con=db_con)
+            with DatabaseConnectionManager(db_path=db_path, mode='rwc') as db:
+                _add_ohlc_table(conf_obj=ctx.obj, ctx_obj=ctx.obj, db=db)
 
         if symbol:  # use symbols from command line input
             symbol = [s.upper() for s in list(symbol)]

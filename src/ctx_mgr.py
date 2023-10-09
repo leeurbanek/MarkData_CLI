@@ -76,7 +76,8 @@ class SpinnerManager:
         while 1:
             for cursor in '|/-\\': yield cursor
 
-    def __init__(self, delay=None):
+    def __init__(self, debug: bool=None, delay=None):
+        self.debug = debug
         self.spinner_generator = self.spinning_cursor()
         if delay and float(delay): self.delay = delay
 
@@ -90,11 +91,14 @@ class SpinnerManager:
 
     def __enter__(self):
         self.busy = True
+        # print(f"debug: {self.debug}")
+        if self.debug: logger.debug(f"SpinnerManager(debug={self.debug}).__enter__()")
         threading.Thread(target=self.spinner_task).start()
 
     def __exit__(self, exception, value, tb):
         self.busy = False
         time.sleep(self.delay)
+        if self.debug: logger.debug(f"SpinnerManager(debug={self.debug}).__exit__()")
         if exception is not None:
             return False
 
@@ -125,10 +129,13 @@ class WebDriverManager:
 
 
 if __name__ == '__main__':
-    with SpinnerManager():
-        time.sleep(2)  # some long-running operation
-
     import unittest
+
+    class SpinnerManagerTest(unittest.TestCase):
+        def test_spinner_manager(self):
+            with SpinnerManager(debug=True) as spinner:
+                time.sleep(2)  # some long-running operation
+
 
     class ContextManagerTest(unittest.TestCase):
         def setUp(self) -> None:

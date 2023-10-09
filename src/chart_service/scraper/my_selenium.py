@@ -41,12 +41,12 @@ class WebScraper:
         if self.debug: logger.debug(f'webscraper({self.symbol}, {self.period})')
         with WebDriverManager(debug=self.debug) as driver:
             if not self.debug: print(f'  fetching chart: {self.symbol}_{self.period.lower()}.png... ', end=' ')
-            with SpinnerManager():
+            with SpinnerManager(debug=self.debug):
                 self._set_chart_page(driver)
                 content = self._get_page_content(driver)
                 src = self._get_img_src(content)
                 self._save_img_to_file(src)
-            if not self.debug: print('\b done')
+            if not self.debug: print('\b done,')
 
     def _get_img_src(self, soup=None):
         """"""

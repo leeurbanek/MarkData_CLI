@@ -39,12 +39,12 @@ class WebScraper:
         """"""
         if self.debug: logger.debug(f'webscraper({self.symbol}, {self.period})')
         if not self.debug: print(f'  fetching chart: {self.symbol}_{self.period.lower()}.png... ', end=' ')
-        with SpinnerManager():
+        with SpinnerManager(debug=self.debug):
             form = self._get_all_forms()[2]
             details = self._get_form_details(form)
             soup = self._submit_form(details)
             self._get_img_src_save_imgage(soup)
-            if not self.debug: print('\b done')
+            if not self.debug: print('\b done,')
 
     def _get_all_forms(self):
         """Returns all form tags found on a web page's `url` """
